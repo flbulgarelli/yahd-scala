@@ -4,25 +4,52 @@ import org.apache.hadoop.io.IntWritable
 import org.apache.hadoop.io.LongWritable
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.WritableComparable
+import org.apache.hadoop.io.BooleanWritable
+import org.apache.hadoop.io.FloatWritable
+import org.apache.hadoop.io.ByteWritable
+import org.apache.hadoop.io.DoubleWritable
 
-object Yahd extends Yahd
-
-trait Yahd {
+object Yahd {
+  type WComparable = WritableComparable[_]
+  
   type WLong = LongWritable
   type WInt = IntWritable
+  type WBoolean = BooleanWritable
+  type WByte = ByteWritable
+  type WFloat = FloatWritable
+  type WDouble = DoubleWritable
+
   type WString = Text
 
-  implicit val intWType = new WType[Int, WInt] {
-    def wrap = new WInt(_)
+  abstract class SimpleWType[A, WA <: WComparable { def get(): A }] extends WType[A, WA]{
     def unwrap = _.get
+  }
+
+  implicit val intWType = new SimpleWType[Int, WInt] {
+    def wrap = new WInt(_)
+  }
+  
+  val longWType = new SimpleWType[Long, WLong] {
+    def wrap = new WLong(_)
+  }
+
+  implicit val boolWType = new SimpleWType[Boolean, WBoolean] {
+    def wrap = new WBoolean(_)
+  }
+  
+  implicit val floatWType = new SimpleWType[Float, WFloat] {
+    def wrap = new WFloat(_)
+  }
+  
+  implicit val doubleWType = new SimpleWType[Double, WDouble] {
+    def wrap = new WDouble(_)
   }
 
   implicit val stringWType = new WType[String, WString] {
     def wrap = new WString(_)
     def unwrap = _.toString
   }
-  
-  type WComparable = WritableComparable[_]
+
 
   implicit def text2String(text: Text) = text.toString
   implicit def string2Text(string: String) = new Text(string)
@@ -40,6 +67,5 @@ trait Yahd {
 
   def id[A] = { x: A => x }
   def const[A, B](x: B) = { _: A => x }
-
 
 }

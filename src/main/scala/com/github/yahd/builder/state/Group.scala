@@ -1,7 +1,7 @@
 package com.github.yahd.builder.state
 import com.github.yahd.Yahd._
 
-
+//FIXME support combiners
 class Group[A, B, C](m: MFunction[A, B, C])
   extends TerminalLike[A, B, C, Nothing, Nothing] {
 

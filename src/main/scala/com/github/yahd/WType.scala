@@ -1,7 +1,8 @@
 package com.github.yahd
 import org.apache.hadoop.io.WritableComparable
+import Yahd._
 
-trait WType[A, B <: WritableComparable[_]] {
-  def wrap: A => B
-  def unwrap: B => A
+trait WType[A, WA <: WComparable] {
+  def wrap: A => WA
+  def unwrap: WA => A
 }

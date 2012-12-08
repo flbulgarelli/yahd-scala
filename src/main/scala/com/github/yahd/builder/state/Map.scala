@@ -5,7 +5,7 @@ import com.github.yahd.Yahd._
 class Map[A, B](pm: A => Iterable[B]) extends ConcatMapLike[B] {
 
   override def map[C](f: B => C) =
-    super.map(f).asInstanceOf[Map[A, C]]
+    super.map(f).asInstanceOf[Map[A, C]] //XXX avoid those casts
 
   override def filter(f: B => Boolean) =
     super.filter(f).asInstanceOf[Map[A, B]]
