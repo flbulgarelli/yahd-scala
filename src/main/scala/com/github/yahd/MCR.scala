@@ -1,34 +1,45 @@
 package com.github.yahd
 
-import com.github.yahd.Yahd._
-import scala.collection.JavaConversions._
-import org.apache.hadoop.io.IntWritable
-import org.apache.hadoop.mapreduce.Reducer
+import scala.annotation.implicitNotFound
+import scala.collection.JavaConversions.iterableAsScalaIterable
 import org.apache.hadoop.mapreduce.Mapper
-import org.apache.hadoop.io.Text
+import org.apache.hadoop.mapreduce.Reducer
+import com.github.yahd.Yahd.CFunction
+import com.github.yahd.Yahd.MFunction
+import com.github.yahd.Yahd.RFunction
+import com.github.yahd.Yahd.JavaIterable
+import com.github.yahd.Yahd.WInt
+import com.github.yahd.Yahd.WLong
+import com.github.yahd.Yahd.WString
+import com.github.yahd.Yahd.int2IntWritable
+import com.github.yahd.Yahd.string2Text
+import com.github.yahd.Yahd.text2String
+import org.apache.hadoop.io.WritableComparable
 
+//FIXME support writable types
 
-case class MCR( m: MFunction[String, String, Int],
-  c: Option[CFunction[String, Int, String, Int]],
-  r: Option[RFunction[String, Int, String, Int]]) {
-  
-  def newMapper = new Mapper[WLong, Text, Text, WInt] {
-    override def map(key: WLong, value: Text, context: Mapper[WLong, Text, Text, WInt]#Context) {
-      m(value).foreach {
+class MCR[C, WC <: WritableComparable[_]](m: MFunction[String, String, C],
+  c: Option[CFunction[String, C, String, C]],
+  r: Option[RFunction[String, C, String, Int]])(implicit cc: WType[C, WC]) {
+
+  def newMapper = new Mapper[WLong, WString, WString, WC] {
+    override def map(key: WLong, value: WString, context: Mapper[WLong, WString, WString, WC]#Context) {
+      m(value.toString).foreach {
         case (k, v) =>
-          context.write(k, v)
+          context.write(k, cc.wrap(v))
       }
     }
   }
 
-  def newReducer = for (f <- r) yield new Reducer[Text, IntWritable, Text, IntWritable] {
-    override def reduce(key: Text, 
-        values: JavaIterable[IntWritable], 
-        context: Reducer[Text, IntWritable, Text, IntWritable]#Context) {
-      f(key, values.map(_.get)).foreach {
+  def newReducer = for (f <- r) yield new Reducer[WString, WC, WString, WInt] {
+    override def reduce(key: WString,
+      values: JavaIterable[WC],
+      context: Reducer[WString, WC, WString, WInt]#Context) {
+      f(key, values.map(cc.unwrap(_))).foreach {
         case (k, v) =>
           context.write(k, v)
       }
+
     }
   }
 

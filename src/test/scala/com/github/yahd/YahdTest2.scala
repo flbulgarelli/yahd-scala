@@ -4,6 +4,7 @@ import org.apache.hadoop.mrunit.mapreduce.MapDriver
 import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver
 import com.github.yahd.Yahd._
+import org.apache.hadoop.io.WritableComparable
 
 object YahdTest2 {
   implicit def testDriver2RunnableDriver[D <: TestDriver[_, _, _, _]](driver: D) = new Object {
@@ -13,7 +14,7 @@ object YahdTest2 {
     }
   }
 
-  def runJob(mcr: => MCR) {
+  def runJob[C, WC <: WComparable](mcr: => MCR[C, WC]) {
     val mapper = mcr.newMapper
     val reducer = mcr.newReducer.get //FIXME
 
