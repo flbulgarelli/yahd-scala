@@ -17,8 +17,11 @@ import org.scalatest.junit.JUnitRunner
 
 import scala.collection.JavaConversions._
 
+import com.github.yahd.Yahd._
+import com.github.yahd.YahdTest2._
+
 @RunWith(classOf[JUnitRunner])
-class WordCountTest extends FunSuite with Yahd {
+class WordCountTest extends FunSuite {
 
   var mapper = new WordCountMapper()
   var reducer = new WordCountReducer()
