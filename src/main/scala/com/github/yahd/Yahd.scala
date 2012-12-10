@@ -31,31 +31,31 @@ object Yahd {
 
   /*WritableComparable implicit converters*/
 
-  abstract class SimpleWType[A, WA <: WComparable { def get(): A }] extends WType[A, WA] {
+  abstract class WComparableConverter[A, WA <: WComparable { def get(): A }] extends Converter[A, WA] {
     def unwrap = _.get
   }
 
-  implicit val intWType = new SimpleWType[Int, WInt] {
+  implicit val intConverter = new WComparableConverter[Int, WInt] {
     def wrap = new WInt(_)
   }
 
-  val longWType = new SimpleWType[Long, WLong] {
+  val longConverter = new WComparableConverter[Long, WLong] {
     def wrap = new WLong(_)
   }
 
-  implicit val boolWType = new SimpleWType[Boolean, WBoolean] {
+  implicit val boolConverter = new WComparableConverter[Boolean, WBoolean] {
     def wrap = new WBoolean(_)
   }
 
-  implicit val floatWType = new SimpleWType[Float, WFloat] {
+  implicit val floatConverter = new WComparableConverter[Float, WFloat] {
     def wrap = new WFloat(_)
   }
 
-  implicit val doubleWType = new SimpleWType[Double, WDouble] {
+  implicit val doubleConverter = new WComparableConverter[Double, WDouble] {
     def wrap = new WDouble(_)
   }
 
-  implicit val stringWType = new WType[String, WString] {
+  implicit val stringConverter = new Converter[String, WString] {
     def wrap = new WString(_)
     def unwrap = _.toString
   }

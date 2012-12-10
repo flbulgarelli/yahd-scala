@@ -7,14 +7,13 @@ import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
-import com.github.yahd.YahdTest2.testDriver2RunnableDriver
 import com.github.yahd.Yahd.int2IntWritable
 import com.github.yahd.Yahd.string2Text
 import Yahd.WLong
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class WordCountTest extends FunSuite {
+class WordCountTest extends FunSuite with YahdTestLike {
 
   var mapper = new WordCountMapper()
   var reducer = new WordCountReducer()
