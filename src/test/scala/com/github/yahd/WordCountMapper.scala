@@ -1,10 +1,13 @@
 package com.github.yahd
 import org.apache.hadoop.mapreduce.Mapper
-import org.apache.hadoop.io.Text
-import org.apache.hadoop.io.LongWritable
-import org.apache.hadoop.io.IntWritable
 
-import com.github.yahd.Yahd._
+import com.github.yahd.Yahd.int2IntWritable
+import com.github.yahd.Yahd.string2Text
+import com.github.yahd.Yahd.string2WordsOps
+
+import Yahd.WInt
+import Yahd.WLong
+import Yahd.WString
 
 class WordCountMapper extends Mapper[WLong, WString, WString, WInt] {
 

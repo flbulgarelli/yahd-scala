@@ -1,6 +1,8 @@
 package com.github.yahd.builder.state
 
-import com.github.yahd.Yahd._
+import com.github.yahd.{Yahd, Prelude}
+import Yahd._
+import Prelude._
 
 class Map[A, B](pm: A => Iterable[B]) extends ConcatMapLike[B] {
 
@@ -10,7 +12,7 @@ class Map[A, B](pm: A => Iterable[B]) extends ConcatMapLike[B] {
   override def filter(f: B => Boolean) =
     super.filter(f).asInstanceOf[Map[A, B]]
 
-  override def concatMap[C](f: B => Iterable[C]): ConcatMapLike[C] =
+  override def concatMap[C](f: B => Iterable[C]) =
     new Map[A, C](
       pm.andThen(_.flatMap(f)))
 

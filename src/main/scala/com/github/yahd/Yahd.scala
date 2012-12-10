@@ -10,8 +10,10 @@ import org.apache.hadoop.io.ByteWritable
 import org.apache.hadoop.io.DoubleWritable
 
 object Yahd {
+  /*Hadoop Writable Type Synonyms*/
+
   type WComparable = WritableComparable[_]
-  
+
   type WLong = LongWritable
   type WInt = IntWritable
   type WBoolean = BooleanWritable
@@ -21,14 +23,22 @@ object Yahd {
 
   type WString = Text
 
-  abstract class SimpleWType[A, WA <: WComparable { def get(): A }] extends WType[A, WA]{
+  /*Hadoop functions type synonyms */
+
+  type MFunction[A, B, C] = A => Iterable[(B, C)]
+  type CFunction[A, B, C, D] = (A, Iterable[B]) => (C, D)
+  type RFunction[A, B, C, D] = (A, Iterable[B]) => Iterable[(C, D)]
+
+  /*WritableComparable implicit converters*/
+
+  abstract class SimpleWType[A, WA <: WComparable { def get(): A }] extends WType[A, WA] {
     def unwrap = _.get
   }
 
   implicit val intWType = new SimpleWType[Int, WInt] {
     def wrap = new WInt(_)
   }
-  
+
   val longWType = new SimpleWType[Long, WLong] {
     def wrap = new WLong(_)
   }
@@ -36,11 +46,11 @@ object Yahd {
   implicit val boolWType = new SimpleWType[Boolean, WBoolean] {
     def wrap = new WBoolean(_)
   }
-  
+
   implicit val floatWType = new SimpleWType[Float, WFloat] {
     def wrap = new WFloat(_)
   }
-  
+
   implicit val doubleWType = new SimpleWType[Double, WDouble] {
     def wrap = new WDouble(_)
   }
@@ -50,7 +60,6 @@ object Yahd {
     def unwrap = _.toString
   }
 
-
   implicit def text2String(text: Text) = text.toString
   implicit def string2Text(string: String) = new Text(string)
   implicit def int2IntWritable(i: Int) = new IntWritable(i)
@@ -58,14 +67,5 @@ object Yahd {
   implicit def string2WordsOps(string: String) = new Object {
     def words = string.split(" ")
   }
-
-  type MFunction[A, B, C] = A => Iterable[(B, C)]
-  type CFunction[A, B, C, D] = (A, Iterable[B]) => (C, D)
-  type RFunction[A, B, C, D] = (A, Iterable[B]) => Iterable[(C, D)]
-
-  type JavaIterable[A] = java.lang.Iterable[A]
-
-  def id[A] = { x: A => x }
-  def const[A, B](x: B) = { _: A => x }
 
 }

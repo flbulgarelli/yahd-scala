@@ -10,7 +10,7 @@ import com.github.yahd.builder._
 import com.github.yahd.builder._
 import com.github.yahd.Yahd._
 import org.apache.hadoop.io.WritableComparable
-
+import Prelude._
 @RunWith(classOf[JUnitRunner])
 class YahdTest extends FunSuite {
 

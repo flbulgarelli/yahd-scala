@@ -1,24 +1,17 @@
 package com.github.yahd
 
-import org.apache.hadoop.io.LongWritable
-import org.apache.hadoop.io.Text
-import org.apache.hadoop.mapreduce.Mapper
-import org.apache.hadoop.mapreduce.Reducer
-import org.apache.hadoop.mrunit.TestDriver
+import scala.collection.JavaConversions.seqAsJavaList
+import org.apache.hadoop.io.IntWritable
 import org.apache.hadoop.mrunit.mapreduce.MapDriver
 import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver
-import org.junit.Before
-import org.junit.Test
-import org.apache.hadoop.io.IntWritable
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
+import com.github.yahd.YahdTest2.testDriver2RunnableDriver
+import com.github.yahd.Yahd.int2IntWritable
+import com.github.yahd.Yahd.string2Text
+import Yahd.WLong
 import org.scalatest.junit.JUnitRunner
-
-import scala.collection.JavaConversions._
-
-import com.github.yahd.Yahd._
-import com.github.yahd.YahdTest2._
 
 @RunWith(classOf[JUnitRunner])
 class WordCountTest extends FunSuite {
@@ -31,7 +24,7 @@ class WordCountTest extends FunSuite {
 
   test("testMapper") {
     mapDriver.testThat { it =>
-      it.withInput(new LongWritable(), "hello world hello hello")
+      it.withInput(new WLong(), "hello world hello hello")
       it.withOutput("hello", 1)
       it.withOutput("world", 1)
       it.withOutput("hello", 1)
@@ -53,7 +46,7 @@ class WordCountTest extends FunSuite {
 
   test("testAll") {
     mapReduceDriver.testThat { it =>
-      it.withInput(new LongWritable(), "hello world hello hello")
+      it.withInput(new WLong(), "hello world hello hello")
       it.withOutput("hello", 3)
       it.withOutput("world", 1)
     }
