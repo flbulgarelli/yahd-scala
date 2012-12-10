@@ -9,7 +9,7 @@ import org.apache.hadoop.mapreduce.Reducer
 
 //FIXME support writable types
 
-class MCR[A, B, C, D, E](m: MFunction[A, B, C],
+case class MCR[A, B, C, D, E](m: MFunction[A, B, C],
   c: Option[CFunction[B, C, B, C]],
   r: Option[RFunction[B, C, D, E]]) {
 
@@ -28,6 +28,8 @@ class MCR[A, B, C, D, E](m: MFunction[A, B, C],
         }
       }
     }
+
+    def newCombiner: Option[Reducer[WB, WC, WB, WC]] = None
 
     def newReducer = for (f <- r) yield new Reducer[WB, WC, WD, WE] {
       override def reduce(key: WB,

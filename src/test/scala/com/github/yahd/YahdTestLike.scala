@@ -14,19 +14,23 @@ trait YahdTestLike {
       driver.runTest
     }
   }
+  
   def runJob[B, WB, C, WC] //
   (mcr: => MCR[String, B, C, String, Int]) //
   (implicit aType: Converter[String, WString],
     bType: Converter[B, WB],
     cType: Converter[C, WC]) {
     val factory = mcr.newMapReduceFactory
+    
     val mapper = factory.newMapper
-    val reducer = factory.newReducer.get //FIXME
-
     var mapDriver = MapDriver.newMapDriver(mapper)
-
-    var reduceDriver = ReduceDriver.newReduceDriver(reducer)
-    var mapReduceDriver = MapReduceDriver.newMapReduceDriver(mapper, reducer)
+    
+    val mapReduceDriver = (factory.newCombiner, factory.newReducer) match {
+      case (Some(combiner), Some(reducer)) => MapReduceDriver.newMapReduceDriver(mapper, reducer, combiner)
+      case (None,           Some(reducer)) => MapReduceDriver.newMapReduceDriver(mapper, reducer)
+      case (None,           None)          => throw new Exception("unsupported yet")
+      case (_,              _)             => throw new Exception("unespecified yet")
+    }
 
     mapReduceDriver.testThat { it =>
       it.withInput(new WLong(), "hello world hello hello")
@@ -35,18 +39,14 @@ trait YahdTestLike {
     }
   }
 
-  import builder.state
-
   def runStreamJob[B, WB, C, WC] //
-  (mcrBuilder: (state.Initial[String] => state.TerminalLike[String, B, C, String, Int])) //
+  (mcrBuilder: MCRBuilder[String, B, C, String, Int]) //
   (implicit aType: Converter[String, WString],
     bType: Converter[B, WB],
-    cType: Converter[C, WC]) =
-    {
-      runJob[B, WB, C, WC] {
-        val mcr = mcrBuilder(new state.Initial).mcr
-        new MCR[String, B, C, String, Int](mcr._1, mcr._2, mcr._3)
-      }
+    cType: Converter[C, WC]) = {
+    runJob[B, WB, C, WC] {
+      buildMCR(mcrBuilder)
     }
+  }
 
 }

@@ -60,6 +60,8 @@ object Yahd {
     def unwrap = _.toString
   }
 
+  /*Common convertions**/
+
   implicit def text2String(text: Text) = text.toString
   implicit def string2Text(string: String) = new Text(string)
   implicit def int2IntWritable(i: Int) = new IntWritable(i)
@@ -67,5 +69,14 @@ object Yahd {
   implicit def string2WordsOps(string: String) = new Object {
     def words = string.split(" ")
   }
+
+  /* MCR builder */
+  
+  import builder.state
+
+  type MCRBuilder[A, B, C, D, E] = state.Initial[A] => state.TerminalLike[A, B, C, D, E]
+
+  def buildMCR[A, B, C, D, E](mcrBuilder: MCRBuilder[A, B, C, D, E]) =
+    mcrBuilder(new state.Initial).mcr
 
 }

@@ -1,5 +1,6 @@
 package com.github.yahd.builder.state
 import com.github.yahd.Yahd._
+import com.github.yahd.MCR
 
 //FIXME support combiners
 class Group[A, B, C](m: MFunction[A, B, C])
@@ -23,7 +24,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
 
   def combineLength = mapValuesLength
 
-  override def mcr = (m, None, None)
+  override def mcr = MCR(m, None, None)
 }
 
 object Group {
