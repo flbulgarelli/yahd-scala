@@ -17,21 +17,34 @@ class Group[A, B, C](m: MFunction[A, B, C])
   def combineWith[D] = mapValuesFolding[D] _
 
   def mapValuesReducing(f: (C, C) => C) = mapValues(_.reduce(f))
-
   def combine = mapValuesReducing _
 
-  def mapValuesLength = mapValuesFolding(0) { (x, y) => x + 1 }
+  def mapValuesMaxBy[D](f:C => D)(implicit n: Ordering[D]) = mapValues(_.maxBy(f))
+  def combineMaxBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMaxBy(f)
+  
+  def mapValuesMinBy[D](f:C => D)(implicit n: Ordering[D]) = mapValues(_.minBy(f))
+  def combineMinBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMinBy(f) 
 
+  def mapValuesLength = mapValuesFolding(0) { (x, y) => x + 1 }
   def combineLength = mapValuesLength
 
   override def mcr = MCR(m, None, None)
 }
 
 object Group {
-  
-  implicit def grouperMCRStream2numericGrouperMCRStream[A, B, C](stream: Group[A, B, C])(implicit n: Numeric[C]) =
+
+  implicit def group2NumericGroup[A, B, C](state: Group[A, B, C])(implicit n: Numeric[C]) =
     new Object {
-      def mapValuesSum = stream.combine(n.plus(_, _))
+      def mapValuesSum = state.mapValues(_.sum)
       def combineSum = mapValuesSum
+    }
+
+  implicit def group2OrderedGroup[A, B, C](state: Group[A, B, C])(implicit n: Ordering[C]) =
+    new Object {
+      def mapValuesMax = state.mapValues(_.max)
+      def combineMax = mapValuesMax
+
+      def mapValuesMin = state.mapValues(_.min)
+      def combineMin = mapValuesMin
     }
 }

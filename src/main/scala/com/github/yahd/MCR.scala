@@ -7,8 +7,6 @@ import scala.collection.JavaConversions._
 import org.apache.hadoop.mapreduce.Mapper
 import org.apache.hadoop.mapreduce.Reducer
 
-//FIXME support writable types
-
 case class MCR[A, B, C, D, E](m: MFunction[A, B, C],
   c: Option[CFunction[B, C, B, C]],
   r: Option[RFunction[B, C, D, E]]) {

@@ -4,7 +4,6 @@ import scala.Array.fallbackCanBuildFrom
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import com.github.yahd.Yahd.string2WordsOps
-import com.github.yahd.builder.state.Group.grouperMCRStream2numericGrouperMCRStream
 import Prelude.const
 import Prelude.id
 import org.scalatest.junit.JUnitRunner
