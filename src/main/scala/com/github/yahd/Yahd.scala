@@ -8,6 +8,8 @@ import org.apache.hadoop.io.BooleanWritable
 import org.apache.hadoop.io.FloatWritable
 import org.apache.hadoop.io.ByteWritable
 import org.apache.hadoop.io.DoubleWritable
+import org.apache.hadoop.mapreduce.Reducer
+import org.apache.hadoop.mapreduce.Mapper
 
 object Yahd {
   /*Hadoop Writable Type Synonyms*/
@@ -71,12 +73,14 @@ object Yahd {
   }
 
   /* MCR builder */
-  
+
   import builder.state
 
   type MCRBuilder[A, B, C, D, E] = state.Initial[A] => state.TerminalLike[A, B, C, D, E]
 
   def buildMCR[A, B, C, D, E](mcrBuilder: MCRBuilder[A, B, C, D, E]) =
     mcrBuilder(new state.Initial).mcr
+
+  def from[A] = new state.Initial[A]
 
 }

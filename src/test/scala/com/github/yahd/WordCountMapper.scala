@@ -12,6 +12,6 @@ import Yahd.WString
 class WordCountMapper extends Mapper[WLong, WString, WString, WInt] {
 
   override def map(key: WLong, value: WString, context: Mapper[WLong, WString, WString, WInt]#Context) =
-    value.toString.words.foreach(context.write(_, 1)) 
+    value.toString.filter { s => s.isSpaceChar || s.isLetterOrDigit }.words.foreach(context.write(_, 1))
 
 }
