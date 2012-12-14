@@ -7,7 +7,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AppMapper extends Mapper {
 	public void run(Context context) throws IOException, InterruptedException {
-		App.getMapper().run(context);
+		AppGlobalConfig.getMapper().run(context);
 	}
 
 }

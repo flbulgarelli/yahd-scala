@@ -12,17 +12,12 @@ import Yahd._
 import Yahd.from
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
 
-object YahdWordCountJob extends App with YahdJob {
+object YahdWordCountJob extends YahdApp {
 
-  defineJob { 
+  val job = defineJob("my job") { 
     from[String].concatMap(_.words).groupMapping(const(1)).combineSum 
   }
 
-  job.setJobName("my job")
-  
-  job.setOutputKeyClass(classOf[Text])
-  job.setOutputValueClass(classOf[IntWritable])
-  
   job.setInputFormatClass(classOf[TextInputFormat])
   job.setOutputFormatClass(classOf[TextOutputFormat[_, _]])
 

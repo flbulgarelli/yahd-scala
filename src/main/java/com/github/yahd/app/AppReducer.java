@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class AppReducer extends Reducer {
 
   public void run(Context context) throws IOException, InterruptedException {
-    App.getReducer().run(context);
+    AppGlobalConfig.getReducer().run(context);
   }
 
 }

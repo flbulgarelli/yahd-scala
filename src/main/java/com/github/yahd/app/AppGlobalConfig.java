@@ -5,7 +5,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
 @SuppressWarnings("rawtypes")
-public class App {
+public class AppGlobalConfig {
 
   private static Mapper mapper;
   private static Reducer reducer;
@@ -24,9 +24,9 @@ public class App {
   }
 
   public static void init(Mapper mapper, Reducer reducer, Reducer combiner) {
-    App.mapper = mapper;
-    App.reducer = reducer;
-    App.combiner = combiner;
+    AppGlobalConfig.mapper = mapper;
+    AppGlobalConfig.reducer = reducer;
+    AppGlobalConfig.combiner = combiner;
   }
 
   public static void configureJob(Job job) {

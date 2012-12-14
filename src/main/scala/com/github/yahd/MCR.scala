@@ -12,17 +12,17 @@ case class MCR[A, B, C, D, E](m: MFunction[A, B, C],
   r: Option[RFunction[B, C, D, E]]) {
 
   def newMapReduceFactory[WA, WB, WC, WD, WE](implicit
-    aType: Converter[A, WA],
-    bType: Converter[B, WB],
-    cType: Converter[C, WC],
-    dType: Converter[D, WD],
-    eType: Converter[E, WE]) = new Object {
+    aConverter: Converter[A, WA],
+    bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC],
+    dConverter: Converter[D, WD],
+    eConverter: Converter[E, WE]) = new Object {
 
     def newMapper = new Mapper[WLong, WA, WB, WC] {
       override def map(key: WLong, value: WA, context: Mapper[WLong, WA, WB, WC]#Context) {
-        m(aType.unwrap(value)).foreach {
+        m(aConverter.unwrap(value)).foreach {
           case (k, v) =>
-            context.write(bType.wrap(k), cType.wrap(v))
+            context.write(bConverter.wrap(k), cConverter.wrap(v))
         }
       }
     }
@@ -33,9 +33,9 @@ case class MCR[A, B, C, D, E](m: MFunction[A, B, C],
       override def reduce(key: WB,
         values: JavaIterable[WC],
         context: Reducer[WB, WC, WD, WE]#Context) {
-        f(bType.unwrap(key), values.map(cType.unwrap(_))).foreach {
+        f(bConverter.unwrap(key), values.map(cConverter.unwrap(_))).foreach {
           case (k, v) =>
-            context.write(dType.wrap(k), eType.wrap(v))
+            context.write(dConverter.wrap(k), eConverter.wrap(v))
         }
       }
     }

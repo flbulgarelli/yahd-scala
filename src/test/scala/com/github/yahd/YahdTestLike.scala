@@ -17,9 +17,9 @@ trait YahdTestLike {
   
   def runJob[B, WB, C, WC] //
   (mcr: => MCR[String, B, C, String, Int]) //
-  (implicit aType: Converter[String, WString],
-    bType: Converter[B, WB],
-    cType: Converter[C, WC]) {
+  (implicit aConverter: Converter[String, WString],
+    bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC]) {
     val factory = mcr.newMapReduceFactory
     
     val mapper = factory.newMapper
@@ -41,9 +41,9 @@ trait YahdTestLike {
 
   def runStreamJob[B, WB, C, WC] //
   (mcrBuilder: MCRBuilder[String, B, C, String, Int]) //
-  (implicit aType: Converter[String, WString],
-    bType: Converter[B, WB],
-    cType: Converter[C, WC]) = {
+  (implicit aConverter: Converter[String, WString],
+    bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC]) = {
     runJob[B, WB, C, WC] {
       buildMCR(mcrBuilder)
     }
