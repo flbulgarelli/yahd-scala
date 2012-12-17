@@ -11,19 +11,13 @@ import Prelude._
 import Yahd._
 import Yahd.from
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
+import builder.state.Initial
+import builder.state.TerminalLike
 
-object YahdWordCountJob extends YahdApp {
+object YahdWordCountJob extends JobApp("my job") {
 
-  val job = defineJob("my job") { 
-    from[String].concatMap(_.words).groupMapping(const(1)).combineSum 
-  }
+  val src = "src/test/resources/sample.txt"
+  val dest = "out"
 
-  job.setInputFormatClass(classOf[TextInputFormat])
-  job.setOutputFormatClass(classOf[TextOutputFormat[_, _]])
-
-  FileInputFormat.addInputPath(job, new Path("src/test/resources/sample.txt"))
-  FileOutputFormat.setOutputPath(job, new Path("out.txt"))
-
-  job.submit
-
+  fromInputPath(src) >> parseText.concatMap(_.words).groupMapping(const(1)).combineSum.formatText >> toOutputPath(dest)
 }
