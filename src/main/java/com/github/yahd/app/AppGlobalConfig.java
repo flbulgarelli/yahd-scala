@@ -23,7 +23,7 @@ public class AppGlobalConfig {
     return mapper;
   }
 
-  public static void init(Mapper mapper, Reducer reducer, Reducer combiner) {
+  public static void init(Mapper mapper, Reducer combiner, Reducer reducer) {
     AppGlobalConfig.mapper = mapper;
     AppGlobalConfig.reducer = reducer;
     AppGlobalConfig.combiner = combiner;

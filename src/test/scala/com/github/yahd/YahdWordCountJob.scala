@@ -14,10 +14,18 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
 import builder.state.Initial
 import builder.state.TerminalLike
 
-object YahdWordCountJob extends JobApp("my job") {
+object YahdWordCountJob extends JobApp("word count 1") {
 
   val src = "src/test/resources/sample.txt"
   val dest = "out"
 
   fromInputPath(src) >> parseText.concatMap(_.words).groupMapping(const(1)).combineSum.formatText >> toOutputPath(dest)
+}
+
+object YahdWordCountJob2 extends JobApp("word count 2") {
+
+  val src = "src/test/resources/sample.txt"
+  val dest = "out2"
+
+  fromInputPath(src) >> parseText.concatMap(_.words).group.combineLength.formatText >> toOutputPath(dest)
 }

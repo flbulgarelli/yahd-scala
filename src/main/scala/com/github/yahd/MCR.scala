@@ -32,7 +32,7 @@ case class MCR[A, B, C, D, E](m: MFunction[A, B, C],
     def newReducer = for (f <- r) yield new Reducer[WB, WC, WD, WE] {
       override def reduce(key: WB,
         values: JavaIterable[WC],
-        context: Reducer[WB, WC, WD, WE]#Context) {
+        context: Reducer[WB, WC, WD, WE]#Context) {        
         f(bConverter.unwrap(key), values.map(cConverter.unwrap(_))).foreach {
           case (k, v) =>
             context.write(dConverter.wrap(k), eConverter.wrap(v))

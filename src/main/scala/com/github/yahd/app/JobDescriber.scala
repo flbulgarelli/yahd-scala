@@ -57,7 +57,7 @@ trait JobRunner {
     job.setOutputFormatClass(format)
   }
 
-  implicit def terminalToFormatteable[A, B, C, D, E](terminal: TerminalLike[A, B, C, D, E]) = new AnyRef {
+  implicit def terminal2Formatteable[A, B, C, D, E](terminal: TerminalLike[A, B, C, D, E]) = new AnyRef {
     def formatText = {
       configureOutputFormat(classOf[TextOutputFormat[_, _]])
       terminal.mcr
