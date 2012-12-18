@@ -3,8 +3,9 @@ package com.github.yahd.builder.state
 import com.github.yahd.{Yahd, Prelude}
 import Yahd._
 import Prelude._
+import com.github.yahd.MCR
 
-class Map[A, B](pm: A => Iterable[B]) extends ConcatMapLike[B] {
+class Map[A, B](val pm: A => Iterable[B]) extends ConcatMapLike[B] {
 
   override def map[C](f: B => C) =
     super.map(f).asInstanceOf[Map[A, C]] //XXX avoid those casts
@@ -26,4 +27,10 @@ class Map[A, B](pm: A => Iterable[B]) extends ConcatMapLike[B] {
 
   def groupMappingOn[C, D](g: B => C)(m: B => D) =
     new Group[A, C, D](pm.andThen(_.map { x => (g(x), m(x)) }))
+}
+
+object Map {
+  implicit def mapToTerminal[A, B, C](mapState : Map[A, (B, C)]) = new TerminalLike[A, B, C, B, C] {
+    override def mcr = MCR(mapState.pm, None, None)
+  }  
 }

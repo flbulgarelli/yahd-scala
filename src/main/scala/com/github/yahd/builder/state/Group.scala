@@ -3,8 +3,7 @@ import com.github.yahd.Yahd._
 import com.github.yahd.MCR
 
 //FIXME support combiners
-class Group[A, B, C](m: MFunction[A, B, C])
-  extends TerminalLike[A, B, C, Nothing, Nothing] {
+class Group[A, B, C](m: MFunction[A, B, C]) {
 
   def mapValues[D](f: Iterable[C] => D) = mapEntries { (k, vs) => (k, f(vs)) }
   def mapKeys[D](f: B => D) = mapEntries { (k, vs) => (f(k), vs) }
@@ -28,7 +27,6 @@ class Group[A, B, C](m: MFunction[A, B, C])
   def mapValuesLength = mapValuesFolding(0) { (x, y) => x + 1 }
   def combineLength = mapValuesLength
 
-  override def mcr = MCR(m, None, None)
 }
 
 object Group {

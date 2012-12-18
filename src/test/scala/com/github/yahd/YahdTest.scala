@@ -11,16 +11,7 @@ import Yahd._
 
 @RunWith(classOf[JUnitRunner])
 class YahdTest extends FunSuite with YahdTestLike {
-  
-  //  def mcrFor[A, B, C, D, E](m: MFunction[A, B, C], c: Option[CFunction[B, C, B, C]], r: Option[RFunction[B, C, D, E]]) =
-  //    (c, r) match {
-  //      case (Some(_), Some(_)) => (m, c, r)
-  //      case (Some(f), _) => (m, c, { (x, y) => (f(x, y)) })
-  //      case (_, _) => (m, None, None)
-  //    }
-  
-  
-  
+
   test("dsl with group") {
     runStreamJob {
       _.
@@ -90,7 +81,15 @@ class YahdTest extends FunSuite with YahdTestLike {
         mapValues(_.sum)
     }
   }
-  
+
+  test("dsl without reducer") {
+    runStreamJob {
+      _.
+        concatMap(_.words).
+        map { x => (x, 1) }
+    }
+  }
+
   test("AllWithDslLowLevelAndCombiner") {
     runJob {
       new MCR(

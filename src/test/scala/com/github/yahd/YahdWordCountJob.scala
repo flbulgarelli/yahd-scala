@@ -13,6 +13,7 @@ import Yahd.from
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
 import builder.state.Initial
 import builder.state.TerminalLike
+import builder.state.Map._
 
 object YahdWordCountJob extends JobApp("word count 1") {
 
@@ -28,4 +29,13 @@ object YahdWordCountJob2 extends JobApp("word count 2") {
   val dest = "out2"
 
   fromInputPath(src) >> parseText.concatMap(_.words).group.combineLength.formatText >> toOutputPath(dest)
+}
+
+object YahdWordGroupByLengthJob extends JobApp("word group by length") {
+
+  val src = "src/test/resources/sample.txt"
+  val dest = "out3"
+
+  fromInputPath(src) >> parseText.concatMap(_.words).map(x => (x.length, x)).formatText >> toOutputPath(dest)
+  
 }

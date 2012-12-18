@@ -63,7 +63,10 @@ trait JobRunner {
       terminal.mcr
     }
   }
-
+  
+  import state.Map._ 
+  implicit def map2Formatteable[A, B, C](map: state.Map[A, (B, C)]) = terminal2Formatteable(map)
+  
   private def configureOutputType(outputType: OutputType) = {
     this.outputType = outputType
     outputType
