@@ -14,8 +14,7 @@ class Map[A, B](val pm: A => Iterable[B]) extends ConcatMapLike[B] {
     super.filter(f).asInstanceOf[Map[A, B]]
 
   override def concatMap[C](f: B => Iterable[C]) =
-    new Map[A, C](
-      pm.andThen(_.flatMap(f)))
+    new Map[A, C](pm >>>(_.flatMap(f)))
 
   def group = groupMappingOn(id)(id)
 
@@ -26,8 +25,11 @@ class Map[A, B](val pm: A => Iterable[B]) extends ConcatMapLike[B] {
     groupMappingOn(grouppingFunction)(id)
 
   def groupMappingOn[C, D](g: B => C)(m: B => D) =
-    new Group[A, C, D](pm.andThen(_.map { x => (g(x), m(x)) }))
+    new Group[A, C, D](pm >>> (_.map { x => (g(x), m(x)) }))
+    
+    
 }
+
 
 object Map {
   implicit def mapToTerminal[A, B, C](mapState : Map[A, (B, C)]) = new TerminalLike[A, B, C, B, C] {

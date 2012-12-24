@@ -24,7 +24,7 @@ class Group[A, B, C](m: MFunction[A, B, C]) {
   def mapValuesMinBy[D](f:C => D)(implicit n: Ordering[D]) = mapValues(_.minBy(f))
   def combineMinBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMinBy(f)
 
-  def mapValuesLength = new Group[A, B, Int](m.andThen(_.map { case (x, y) => (x, 1) })).mapValues(_.sum)
+  def mapValuesLength = new Group[A, B, Int](m >>> (_.map { case (x, y) => (x, 1) })).mapValues(_.sum)
   def combineLength = mapValuesLength
 
 }
