@@ -82,7 +82,7 @@ class YahdTest extends FunSuite with YahdTestLike {
     }
   }
 
-  test("dsl without reducer") {
+  ignore("dsl without reducer") {
     runStreamJob {
       _.
         concatMap(_.words).

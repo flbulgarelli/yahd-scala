@@ -1,12 +1,12 @@
 package com.github.yahd.builder.state
 import com.github.yahd.Yahd._
 import com.github.yahd.MCR
-
+import com.github.yahd.Prelude._
 //FIXME support combiners
 class Group[A, B, C](m: MFunction[A, B, C]) {
-
-  def mapValues[D](f: Iterable[C] => D) = mapEntries { (k, vs) => (k, f(vs)) }
-  def mapKeys[D](f: B => D) = mapEntries { (k, vs) => (f(k), vs) }
+  
+  def mapValues[D](f: Iterable[C] => D) = mapEntries { onSecond(f) }
+  def mapKeys[D](f: B => D) = mapEntries { onFirst(f) }
   def mapEntries[D, E](f: (B, Iterable[C]) => (D, E)) =
     new Reduce[A, B, C, D, E](m, { (k, vs) => Iterable(f(k, vs)) })
 
@@ -22,9 +22,9 @@ class Group[A, B, C](m: MFunction[A, B, C]) {
   def combineMaxBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMaxBy(f)
   
   def mapValuesMinBy[D](f:C => D)(implicit n: Ordering[D]) = mapValues(_.minBy(f))
-  def combineMinBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMinBy(f) 
+  def combineMinBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMinBy(f)
 
-  def mapValuesLength = mapValuesFolding(0) { (x, y) => x + 1 }
+  def mapValuesLength = new Group[A, B, Int](m.andThen(_.map { case (x, y) => (x, 1) })).mapValues(_.sum)
   def combineLength = mapValuesLength
 
 }
