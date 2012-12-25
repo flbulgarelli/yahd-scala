@@ -6,14 +6,10 @@ import com.github.yahd._
 import Yahd._
 import builder._
 import org.apache.hadoop.mapred.FileOutputFormat
-import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.hadoop.fs.Path
-import com.github.yahd._
-import Yahd._
 import com.github.yahd.builder.state.TerminalLike
 import com.github.yahd.Prelude._
-import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
@@ -21,6 +17,12 @@ import org.apache.hadoop.mapreduce.InputFormat
 import org.apache.hadoop.mapreduce.OutputFormat
 import com.github.yahd.app.config.FileInputType
 import com.github.yahd.app.config.FileOutputType
+import com.github.yahd.app.config.OutputType
+import com.github.yahd.app.config.InputType
+import com.github.yahd.app.config.JobConfiguration
+import com.github.yahd.app.config.Fixed
+import com.github.yahd.app.config.CommandLine
+
 trait JobRunner {
   private var inputType: JobConfiguration = _
   private var outputType: JobConfiguration = _

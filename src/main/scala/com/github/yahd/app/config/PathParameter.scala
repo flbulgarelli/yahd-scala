@@ -1,4 +1,4 @@
-package com.github.yahd.app
+package com.github.yahd.app.config
 import org.apache.hadoop.fs.Path
 import com.github.yahd.Prelude._
 

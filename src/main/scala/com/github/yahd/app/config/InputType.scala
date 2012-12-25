@@ -1,4 +1,4 @@
-package com.github.yahd.app
+package com.github.yahd.app.config
 import com.github.yahd.MCR
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
