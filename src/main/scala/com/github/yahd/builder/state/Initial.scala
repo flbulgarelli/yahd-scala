@@ -1,10 +1,7 @@
 package com.github.yahd.builder.state
 
-
-//FIXME make arguments variant
-class Initial[A] extends ConcatMapLike[A] {
+class Initial[A] extends MapLike[A] {
   
-  //XXX avoid overriding
   override def map[B](f: A => B) =
     super.map(f).asInstanceOf[Map[A, B]]
 
