@@ -7,7 +7,7 @@ import com.github.yahd.MCR
 
 class Map[A, B](val pm: A => Iterable[B]) extends MapLike[A, B] {
 
-  override def concatMap[C](f: B => Iterable[C]) =
+  override def flatMap[C](f: B => Iterable[C]) =
     new Map[A, C](pm >>>(_.flatMap(f)))
 
   def group = groupMappingOn(id)(id)
