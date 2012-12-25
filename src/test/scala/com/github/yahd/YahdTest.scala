@@ -89,6 +89,17 @@ class YahdTest extends FunSuite with YahdTestLike {
         map { x => (x, 1) }
     }
   }
+  
+  test("dsl with filter") {
+    runStreamJob {
+      _.
+        filter(!_.startsWith("#")).
+        concatMap(_.words).
+        group.
+        combineLength
+    }
+  }
+  
 
   test("AllWithDslLowLevelAndCombiner") {
     runJob {

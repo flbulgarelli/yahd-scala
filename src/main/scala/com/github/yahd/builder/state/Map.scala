@@ -5,13 +5,7 @@ import Yahd._
 import Prelude._
 import com.github.yahd.MCR
 
-class Map[A, B](val pm: A => Iterable[B]) extends MapLike[B] {
-
-  override def map[C](f: B => C) =
-    super.map(f).asInstanceOf[Map[A, C]] //XXX avoid those casts
-
-  override def filter(f: B => Boolean) =
-    super.filter(f).asInstanceOf[Map[A, B]]
+class Map[A, B](val pm: A => Iterable[B]) extends MapLike[A, B] {
 
   override def concatMap[C](f: B => Iterable[C]) =
     new Map[A, C](pm >>>(_.flatMap(f)))
