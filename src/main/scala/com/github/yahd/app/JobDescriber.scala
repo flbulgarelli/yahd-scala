@@ -28,14 +28,6 @@ trait JobRunner {
   private val conf = new Configuration
   implicit val job = new Job(conf)
 
-  class MapCombineReduceConfiguration(ouputKeyClass: Class[_], ouputValueClass: Class[_]) extends JobConfiguration {
-    def configureJob(cmdLine: Array[String], job: Job) {
-      app.AppGlobalConfig.configureJob(job)
-      job.setOutputKeyClass(ouputKeyClass)
-      job.setOutputValueClass(ouputValueClass)
-    }
-  }
-
   private def configureInputType(inputType: InputType) = {
     this.inputType = inputType
     inputType
