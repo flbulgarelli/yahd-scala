@@ -5,8 +5,14 @@ import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver
 import com.github.yahd.Yahd._
 import org.apache.hadoop.io.WritableComparable
-
+import MapReduceDriver._
+import MapDriver._
 trait YahdTestLike {
+
+  type Driver = TestDriver[_, _, _, _] {
+    def withInput(x: Any, y: Any): Any
+    def withOutput(x: Any, y: Any): Any
+  }
 
   implicit def testDriver2RunnableDriver[D <: TestDriver[_, _, _, _]](driver: D) = new Object {
     def testThat(f: Function[D, Unit]): Unit = {
@@ -20,22 +26,18 @@ trait YahdTestLike {
   (implicit aConverter: Converter[String, WString],
     bConverter: Converter[B, WB],
     cConverter: Converter[C, WC]) {
-    val factory = mcr.newMapReduceFactory
     
-    val mapper = factory.newMapper
-    var mapDriver = MapDriver.newMapDriver(mapper)
     
-    val mapReduceDriver = (factory.newCombiner, factory.newReducer) match {
-      case (Some(combiner), Some(reducer)) => MapReduceDriver.newMapReduceDriver(mapper, reducer, combiner)
-      case (None,           Some(reducer)) => MapReduceDriver.newMapReduceDriver(mapper, reducer)
-      case (None,           None)          => throw new Exception("unsupported yet")
-      case (_,              _)             => throw new Exception("unespecified yet")
+    val mapReduceDriver = mcr match {
+      case M(m)     => newMapDriver[WLong, WString, WString, WInt](m)
+      case MC(m, c) => newMapReduceDriver[WLong, WString, WString, WInt, WString, WInt](m, c, c)
+      case MR(m, r) => newMapReduceDriver[WLong, WString, WB, WC, WString, WInt](m, r)
     }
 
-    mapReduceDriver.testThat { it =>
-      it.withInput(new WLong(), "hello world hello hello")
-      it.withOutput("hello", 3)
-      it.withOutput("world", 1)
+    mapReduceDriver.asInstanceOf[Driver].testThat { it =>
+      it.withInput(new WLong(), "hello world hello hello" : WString)
+      it.withOutput("hello" : WString, 3 : WInt)
+      it.withOutput("world" : WString, 1 : WInt)
     }
   }
 

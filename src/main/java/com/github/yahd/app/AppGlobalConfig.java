@@ -1,5 +1,6 @@
 package com.github.yahd.app;
 
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -23,7 +24,9 @@ public class AppGlobalConfig {
     return mapper;
   }
 
-  public static void init(Mapper mapper, Reducer combiner, Reducer reducer) {
+  public static <WA, WB, WC, WD, WE> void init(
+    Mapper<LongWritable, WA, WB, WC> mapper, 
+    Reducer<WB, WC, WB, WC> combiner, Reducer<WB, WC, WD, WE> reducer) {
     AppGlobalConfig.mapper = mapper;
     AppGlobalConfig.reducer = reducer;
     AppGlobalConfig.combiner = combiner;

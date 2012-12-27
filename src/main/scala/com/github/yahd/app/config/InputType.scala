@@ -4,6 +4,11 @@ import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import com.github.yahd.Converter
 import com.github.yahd._
+import com.github.yahd.Yahd.m2Mapper
+import com.github.yahd.Yahd.r2Reducer
+import com.github.yahd.Yahd.c2Reducer
+import com.github.yahd.app.AppGlobalConfig
+import AppGlobalConfig.{init => initApp}
 
 trait InputType extends JobConfiguration {
 
@@ -19,8 +24,13 @@ trait InputType extends JobConfiguration {
     dManifest: Manifest[WD],
     eManifest: Manifest[WE],
     job: Job) = {
-    val factory = mcr.newMapReduceFactory
-    app.AppGlobalConfig.init(factory.newMapper, factory.newCombiner.orNull, factory.newReducer.orNull)
+    
+    mcr match {
+      case M(m)     => initApp[WA, WD, WE, WD, WE](m, null, null)
+      case MC(m, c) => initApp[WA, WD, WE, WD, WE](m, c, c)
+      case MR(m, r) => initApp[WA, WB, WC, WD, WE](m, null, r)
+    }
+    
     job.setMapOutputKeyClass(bManifest.erasure)
     job.setMapOutputValueClass(cManifest.erasure)
     job.setOutputKeyClass(dManifest.erasure)

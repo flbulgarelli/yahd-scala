@@ -3,7 +3,7 @@ package com.github.yahd.builder.state
 import com.github.yahd.{Yahd, Prelude}
 import Yahd._
 import Prelude._
-import com.github.yahd.MCR
+import com.github.yahd.M
 
 class Map[A, B](val pm: A => Iterable[B]) extends MapLike[A, B] {
 
@@ -27,6 +27,6 @@ class Map[A, B](val pm: A => Iterable[B]) extends MapLike[A, B] {
 
 object Map {
   implicit def mapToTerminal[A, B, C](mapState : Map[A, (B, C)]) = new TerminalLike[A, B, C, B, C] {
-    override def mcr = MCR(mapState.pm, None, None)
+    override def mcr = M(mapState.pm)
   }  
 }

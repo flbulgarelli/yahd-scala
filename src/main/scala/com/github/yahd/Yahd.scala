@@ -10,6 +10,9 @@ import org.apache.hadoop.io.ByteWritable
 import org.apache.hadoop.io.DoubleWritable
 import org.apache.hadoop.mapreduce.Reducer
 import org.apache.hadoop.mapreduce.Mapper
+import Prelude.Id
+import scala.collection.JavaConversions._
+import java.lang.{Iterable => JavaIterable}
 
 object Yahd {
   /*Hadoop Writable Type Synonyms*/
@@ -26,10 +29,12 @@ object Yahd {
   type WString = Text
 
   /*Hadoop functions type synonyms */
+  
 
   type MFunction[A, B, C] = A => Iterable[(B, C)]
-  type CFunction[A, B, C, D] = (A, Iterable[B]) => (C, D)
-  type RFunction[A, B, C, D] = (A, Iterable[B]) => Iterable[(C, D)]
+  type RLikeFunction[A, B, C, D, Functor[_]] = (A, Iterable[B]) => Functor[(C, D)] 
+  type CFunction[A, B] = RLikeFunction[A, B, A, B, Id]
+  type RFunction[A, B, C, D] = RLikeFunction[A, B, C, D, Iterable]
 
   /*WritableComparable implicit converters*/
 
@@ -61,7 +66,7 @@ object Yahd {
     def wrap = new WString(_)
     def unwrap = _.toString
   }
-
+  
   /*Common convertions**/
 
   implicit def text2String(text: Text) = text.toString
@@ -71,7 +76,7 @@ object Yahd {
   implicit def string2WordsOps(string: String) = new Object {
     def words = string.split(" ")
   }
-
+  
   /* MCR builder */
 
   import builder.state
@@ -82,5 +87,44 @@ object Yahd {
     mcrBuilder(new state.Initial).mcr
 
   def from[A] = new state.Initial[A]
+
+  /*Function to Hadoop Objects convertions*/
+
+  private def newReducer0[B, C, D, E, WB, WC, WD, WE](r: RFunction[B, C, D, E])
+    (implicit bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC],
+    dConverter: Converter[D, WD],
+    eConverter: Converter[E, WE]) = new Reducer[WB, WC, WD, WE] {
+    override def reduce(key: WB,
+      values: JavaIterable[WC],
+      context: Reducer[WB, WC, WD, WE]#Context) {
+      r(bConverter.unwrap(key), values.map(cConverter.unwrap(_))).foreach {
+        case (k, v) =>
+          context.write(dConverter.wrap(k), eConverter.wrap(v))
+      }
+    }
+  }
+
+  implicit def m2Mapper[A, B, C, WA, WB, WC](m: MFunction[A, B, C]) //
+  (implicit aConverter: Converter[A, WA],
+    bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC]) = new Mapper[WLong, WA, WB, WC] {
+    override def map(key: WLong, value: WA, context: Mapper[WLong, WA, WB, WC]#Context) {
+      m(aConverter.unwrap(value)).foreach {
+        case (k, v) =>
+          context.write(bConverter.wrap(k), cConverter.wrap(v))
+      }
+    }
+  }
+
+  implicit def c2Reducer[B, C, WB, WC](c: CFunction[B, C]) //
+  (implicit bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC]) = newReducer0[B, C, B, C, WB, WC, WB, WC]((x, y) => List(c(x, y)))
+
+  implicit def r2Reducer[B, C, D, E, WB, WC, WD, WE](r: RFunction[B, C, D, E]) //
+  (implicit bConverter: Converter[B, WB],
+    cConverter: Converter[C, WC],
+    dConverter: Converter[D, WD],
+    eConverter: Converter[E, WE]) = newReducer0(r)
 
 }

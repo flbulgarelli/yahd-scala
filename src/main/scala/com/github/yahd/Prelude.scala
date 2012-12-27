@@ -9,6 +9,8 @@ object Prelude {
 
   def onFirst[A, B, C](f: B => C) = (x: B, y: A) => (f(x), y)
   def onSecond[A, B, C](f: B => C) = (x: A, y: B) => (x, f(y))
+  
+  type Id[A] = A
 
   implicit def function2Composable[A, B](f:A => B) = new AnyRef {
     def >>>[C] = (g: B => C) => f.andThen(g)

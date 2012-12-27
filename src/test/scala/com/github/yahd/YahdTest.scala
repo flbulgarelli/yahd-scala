@@ -103,19 +103,17 @@ class YahdTest extends FunSuite with YahdTestLike {
 
   test("AllWithDslLowLevelAndCombiner") {
     runJob {
-      new MCR(
+      MC[String, String, Int, String, Int](
         _.words.map { x => (x, 1) },
-        Some(((k: String), (v: Iterable[Int])) => (k, v.sum)),
-        Some(((k: String), (v: Iterable[Int])) => List((k, v.sum))))
+        (k, v) => (k, v.sum))
     }
   }
 
   test("AllWithDslLowLevel") {
     runJob {
-      new MCR(
+      MR[String, String, Int, String, Int](
         _.words.map { x => (x, 1) },
-        None,
-        Some(((k: String), (v: Iterable[Int])) => List((k, v.sum))))
+        (k, v) => List((k, v.sum)))
     }
   }
 
