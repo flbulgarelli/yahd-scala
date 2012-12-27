@@ -17,7 +17,7 @@ class YahdTest extends FunSuite with YahdTestLike {
       _.
         flatMap(_.words).
         group.
-        mapValuesLength
+        lengthValues
     }
   }
   test("dsl with groupOn") {
@@ -25,24 +25,24 @@ class YahdTest extends FunSuite with YahdTestLike {
       _.
         flatMap(_.words).
         groupOn(id).
-        mapValuesLength
+        lengthValues
     }
   }
-  test("dsl with combineLength") {
+  test("dsl with lengthValues") {
     runStreamJob {
       _.
         flatMap(_.words).
         group.
-        combineLength
+        lengthValues
     }
   }
 
-  test("dsl with groupMapping and combineSum") {
+  test("dsl with groupMapping and sumValues") {
     runStreamJob {
       _.
         flatMap(_.words).
         groupMapping(const(1)).
-        combineSum
+        sumValues
     }
   }
 
@@ -51,7 +51,7 @@ class YahdTest extends FunSuite with YahdTestLike {
       _.
         flatMap(_.words).
         groupMappingOn(id)(const(1)).
-        mapValuesReducing(_ + _)
+        reduceValues(_ + _)
     }
   }
 
@@ -60,15 +60,16 @@ class YahdTest extends FunSuite with YahdTestLike {
       _.
         flatMap(_.words).
         groupMappingOn(id)(const(1)).
-        combine(_ + _)
+        combineValues(_ + _)
     }
   }
+  import Prelude.onValue
   test("dsl with mapValues -- not combinable") {
     runStreamJob {
       _.
         flatMap(_.words).
         group.
-        mapValues(_.size)
+        mapPairs(onValue(_.size))
     }
   }
 
@@ -78,7 +79,7 @@ class YahdTest extends FunSuite with YahdTestLike {
         flatMap(_.words).
         map { x => (x, 1) }.
         groupMappingOn(_._1)(_._2).
-        mapValues(_.sum)
+        mapPairs((k, vs) => (k, vs.sum))
     }
   }
 
@@ -96,7 +97,7 @@ class YahdTest extends FunSuite with YahdTestLike {
         filter(!_.startsWith("#")).
         flatMap(_.words).
         group.
-        combineLength
+        lengthValues
     }
   }
   

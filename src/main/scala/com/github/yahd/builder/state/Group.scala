@@ -4,45 +4,53 @@ import com.github.yahd.MCR
 import com.github.yahd.Prelude._
 //FIXME support combiners
 class Group[A, B, C](m: MFunction[A, B, C]) {
+
+  //Pair-oriented
+  def mapPairs[D, E](f: (B, Iterable[C]) => (D, E)) =
+    flatMapPairs { (k, vs) => List(f(k, vs)) }
+ 
+  def filterPairs[D, E](f: (B, Iterable[C]) => Boolean) =
+    flatMapPairs { (k, vs) => if (f(k, vs)) List((k, vs)) else Nil } 
+    
+  def flatMapPairs[D, E](f: (B, Iterable[C]) => Iterable[(D, E)]) =
+    new Reduce[A, B, C, D, E](m, { (k, vs) => f(k, vs) })    
   
-  def mapValues[D](f: Iterable[C] => D) = mapEntries { onSecond(f) }
-  def mapKeys[D](f: B => D) = mapEntries { onFirst(f) }
-  def mapEntries[D, E](f: (B, Iterable[C]) => (D, E)) =
-    new Reduce[A, B, C, D, E](m, { (k, vs) => Iterable(f(k, vs)) })
-
-  def mapValuesFolding[D](initial: D)(f: (D, C) => D) =
-    mapValues(_.foldLeft(initial)(f))
-
-  def combineWith[D] = mapValuesFolding[D] _
-
-  def mapValuesReducing(f: (C, C) => C) = mapValues(_.reduce(f))
-  def combine = mapValuesReducing _
-
-  def mapValuesMaxBy[D](f:C => D)(implicit n: Ordering[D]) = mapValues(_.maxBy(f))
-  def combineMaxBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMaxBy(f)
+  //Value-oriented
   
-  def mapValuesMinBy[D](f:C => D)(implicit n: Ordering[D]) = mapValues(_.minBy(f))
-  def combineMinBy[D](f: C => D)(implicit n: Ordering[D]) = mapValuesMinBy(f)
+  private def mapPairsOnValue[D](f: Iterable[C] => D) = mapPairs { onValue(f) }
 
-  def mapValuesLength = new Group[A, B, Int](m >>> (_.map { case (x, y) => (x, 1) })).mapValues(_.sum)
-  def combineLength = mapValuesLength
+  def mapValues[D](f: C => D) =
+    mapPairsOnValue(_.map(f))
+    
+  def filterValues(f: C => Boolean) =
+    mapPairsOnValue(_.filter(f))
+  
+  def foldValues[D](initial: D)(f: (D, C) => D) =
+    mapPairsOnValue(_.foldLeft(initial)(f))
 
+  def reduceValues(f: (C, C) => C) = mapPairsOnValue(_.reduce(f))
+  
+  def combineValues = reduceValues _
+
+  def maxValuesBy[D](f:C => D)(implicit n: Ordering[D]) = mapPairsOnValue(_.maxBy(f))
+  
+  def minValuesBy[D](f:C => D)(implicit n: Ordering[D]) = mapPairsOnValue(_.minBy(f))
+
+  def lengthValues = new Group[A, B, Int](m >>> (_.map { case (x, y) => (x, 1) })).mapPairsOnValue(_.sum)
+  
+  def countValues(f: C => Boolean) = mapPairsOnValue(_.count(f))
 }
 
 object Group {
 
   implicit def group2NumericGroup[A, B, C](state: Group[A, B, C])(implicit n: Numeric[C]) =
     new Object {
-      def mapValuesSum = state.mapValues(_.sum)
-      def combineSum = mapValuesSum
+      def sumValues = state.mapPairsOnValue(_.sum)
     }
 
   implicit def group2OrderedGroup[A, B, C](state: Group[A, B, C])(implicit n: Ordering[C]) =
     new Object {
-      def mapValuesMax = state.mapValues(_.max)
-      def combineMax = mapValuesMax
-
-      def mapValuesMin = state.mapValues(_.min)
-      def combineMin = mapValuesMin
+      def maxValues = state.mapPairsOnValue(_.max)
+      def minValues = state.mapPairsOnValue(_.min)
     }
 }
