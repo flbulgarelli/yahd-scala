@@ -2,7 +2,7 @@ package com.github.yahd.builder.state
 import com.github.yahd.Yahd._
 import com.github.yahd.MCR
 import com.github.yahd.Prelude._
-//FIXME support combiners
+
 class Group[A, B, C](m: MFunction[A, B, C]) {
 
   //Group-oriented
@@ -17,17 +17,17 @@ class Group[A, B, C](m: MFunction[A, B, C]) {
   
   //Value-oriented
   
-  private def mapGroupsOnValueWithReducer[D](f: Iterable[C] => D) = 
+  def mapGroupsOnValueWithReducer[D](f: Iterable[C] => D) = 
     mapGroups { Grouping.onValue(f) }
   
-  private def mapGroupsOnValueWithCombiner(f: Iterable[C] => C) = 
+  def mapGroupsOnValueWithCombiner(f: Iterable[C] => C) = 
     new Combine[A, B, C](m, (k, vs) => Grouping(k, f(vs)) )
 
   def mapValues[D](f: C => D) =
-    mapGroupsOnValueWithReducer(_.map(f))
+    composedGroup[D](_.map { case (x, y) => Grouping(x, f(y)) } )
     
   def filterValues(f: C => Boolean) =
-    mapGroupsOnValueWithReducer(_.filter(f))
+    composedGroup[C](_.filter { case (x, y) => f(y) } )
   
   def foldValues[D](initial: D)(f: (D, C) => D) =
     mapGroupsOnValueWithReducer(_.foldLeft(initial)(f))
@@ -69,7 +69,6 @@ class Group[A, B, C](m: MFunction[A, B, C]) {
   
   def countValues =
     genericCountValues[Int] _
-  
   
   //TODO distinct, average, count = length?, map as groupMapping?, support list as output, flatMapValues, pipeline of reduce
 }
