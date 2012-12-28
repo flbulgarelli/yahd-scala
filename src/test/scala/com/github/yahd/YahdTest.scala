@@ -63,13 +63,13 @@ class YahdTest extends FunSuite with YahdTestLike {
         combineValues(_ + _)
     }
   }
-  import Prelude.onValue
+  import Prelude.Grouping.onValue
   test("dsl with mapValues -- not combinable") {
     runStreamJob {
       _.
         flatMap(_.words).
         group.
-        mapPairs(onValue(_.size))
+        mapGroups(onValue(_.size))
     }
   }
 
@@ -79,7 +79,7 @@ class YahdTest extends FunSuite with YahdTestLike {
         flatMap(_.words).
         map { x => (x, 1) }.
         groupMappingOn(_._1)(_._2).
-        mapPairs((k, vs) => (k, vs.sum))
+        mapGroups((k, vs) => (k, vs.sum))
     }
   }
 

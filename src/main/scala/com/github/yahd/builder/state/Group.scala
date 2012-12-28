@@ -5,52 +5,72 @@ import com.github.yahd.Prelude._
 //FIXME support combiners
 class Group[A, B, C](m: MFunction[A, B, C]) {
 
-  //Pair-oriented
-  def mapPairs[D, E](f: (B, Iterable[C]) => (D, E)) =
-    flatMapPairs { (k, vs) => List(f(k, vs)) }
+  //Group-oriented
+  def mapGroups[D, E](f: (B, Iterable[C]) => Grouping[D, E]) =
+    flatMapGroups { (k, vs) => List(f(k, vs)) }
  
-  def filterPairs[D, E](f: (B, Iterable[C]) => Boolean) =
-    flatMapPairs { (k, vs) => if (f(k, vs)) List((k, vs)) else Nil } 
+  def filterGroups[D, E](f: (B, Iterable[C]) => Boolean) =
+    flatMapGroups { (k, vs) => if (f(k, vs)) List(Grouping(k, vs)) else Nil } 
     
-  def flatMapPairs[D, E](f: (B, Iterable[C]) => Iterable[(D, E)]) =
+  def flatMapGroups[D, E](f: (B, Iterable[C]) => Iterable[Grouping[D, E]]) =
     new Reduce[A, B, C, D, E](m, { (k, vs) => f(k, vs) })    
   
   //Value-oriented
   
-  private def mapPairsOnValue[D](f: Iterable[C] => D) = mapPairs { onValue(f) }
+  private def mapGroupsOnValueWithReducer[D](f: Iterable[C] => D) = 
+    mapGroups { Grouping.onValue(f) }
+  
+  private def mapGroupsOnValueWithCombiner(f: Iterable[C] => C) = 
+    new Combine[A, B, C](m, (k, vs) => Grouping(k, f(vs)) )
 
   def mapValues[D](f: C => D) =
-    mapPairsOnValue(_.map(f))
+    mapGroupsOnValueWithReducer(_.map(f))
     
   def filterValues(f: C => Boolean) =
-    mapPairsOnValue(_.filter(f))
+    mapGroupsOnValueWithReducer(_.filter(f))
   
   def foldValues[D](initial: D)(f: (D, C) => D) =
-    mapPairsOnValue(_.foldLeft(initial)(f))
+    mapGroupsOnValueWithReducer(_.foldLeft(initial)(f))
 
-  def reduceValues(f: (C, C) => C) = mapPairsOnValue(_.reduce(f))
+  def reduceValues(f: (C, C) => C) =
+    mapGroupsOnValueWithReducer(_.reduce(f))
   
-  def combineValues = reduceValues _
+  def combineValues(f: (C, C) => C) = 
+    mapGroupsOnValueWithCombiner(_.reduce(f))
 
-  def maxValuesBy[D](f:C => D)(implicit n: Ordering[D]) = mapPairsOnValue(_.maxBy(f))
+  def maxValuesBy[D : Ordering](f:C => D) =
+    mapGroupsOnValueWithCombiner(_.maxBy(f))
   
-  def minValuesBy[D](f:C => D)(implicit n: Ordering[D]) = mapPairsOnValue(_.minBy(f))
-
-  def lengthValues = new Group[A, B, Int](m >>> (_.map { case (x, y) => (x, 1) })).mapPairsOnValue(_.sum)
+  def minValuesBy[D : Ordering](f:C => D) = 
+    mapGroupsOnValueWithCombiner(_.minBy(f))
+    
+   def maxValues(implicit o : Ordering[C]) = 
+     mapGroupsOnValueWithCombiner(_.max)
+     
+   def minValues(implicit o : Ordering[C]) = 
+     mapGroupsOnValueWithCombiner(_.min)
   
-  def countValues(f: C => Boolean) = mapPairsOnValue(_.count(f))
+   def sumValues(implicit n : Numeric[C])  = 
+     mapGroupsOnValueWithCombiner(_.sum)
+     
+  private def composedGroup[D](g: Iterable[Grouping[B, C]] => Iterable[Grouping[B, D]]) =
+    new Group[A, B, D](m >>> g)
+  
+  import Grouping.unitary                                          
+  
+  def genericLengthValues[N : Numeric] = 
+    composedGroup[N](_.map { case (x, y) => unitary(x) }).sumValues
+  
+  def genericCountValues[N : Numeric](f: C => Boolean) = 
+    composedGroup[N](_.flatMap { case (x, y) => if (f(y)) List(unitary(x)) else Nil }).sumValues
+  
+  def lengthValues = 
+    genericLengthValues[Int]
+  
+  def countValues =
+    genericCountValues[Int] _
+  
+  
+  //TODO distinct, average, count = length?, map as groupMapping?, support list as output, flatMapValues, pipeline of reduce
 }
 
-object Group {
-
-  implicit def group2NumericGroup[A, B, C](state: Group[A, B, C])(implicit n: Numeric[C]) =
-    new Object {
-      def sumValues = state.mapPairsOnValue(_.sum)
-    }
-
-  implicit def group2OrderedGroup[A, B, C](state: Group[A, B, C])(implicit n: Ordering[C]) =
-    new Object {
-      def maxValues = state.mapPairsOnValue(_.max)
-      def minValues = state.mapPairsOnValue(_.min)
-    }
-}

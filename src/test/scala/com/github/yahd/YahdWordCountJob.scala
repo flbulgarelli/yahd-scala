@@ -39,3 +39,12 @@ object YahdWordGroupByLengthJob extends JobApp("word group by length") {
   fromInputPath(src) >> parseText.flatMap(_.words).map(x => (x.length, x)).formatText >> toOutputPath(dest)
   
 }
+
+object YahdWordCountByLengthJob extends JobApp("word count by length") {
+
+  val src = "src/test/resources/sample.txt"
+  val dest = "out4"
+    
+  fromInputPath(src) >> parseText.flatMap(_.words).groupOn(_.length).lengthValues.formatText >> toOutputPath(dest)
+  
+}
