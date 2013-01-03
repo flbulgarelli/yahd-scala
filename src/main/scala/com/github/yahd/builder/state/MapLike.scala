@@ -1,11 +1,10 @@
 package com.github.yahd.builder.state
+import com.github.yahd.Prelude.Grouping
+import scala.collection.generic.CanBuildFrom
+import com.github.yahd.MonadicLike
 
-trait MapLike[A, B] {
-  def map[C](f: B => C) =
-    flatMap { x => List(f(x)) }
+trait MapLike[A, B] extends MonadicLike[B] {
 
-  def filter(f: B => Boolean) =
-    flatMap { x => if (f(x)) List(x) else Nil }
+  type This[C] = Map[A, C]
 
-  def flatMap[C](f: B => Iterable[C]): Map[A, C]
 }
