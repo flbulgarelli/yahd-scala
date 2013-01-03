@@ -31,6 +31,16 @@ object YahdWordCountJob2 extends JobApp("word count 2") {
   fromInputPath(src) >> parseText.flatMap(_.words).group.lengthValues.formatText >> toOutputPath(dest)
 }
 
+object YahdWordCountJobPlain extends JobApp("word count 2") {
+
+  val src = "src/test/resources/sample.txt"
+  val dest = "out5"
+
+  import Grouping._
+  fromInputPath(src) >> MC[String, String, Int, String, Int](x => List((x, 1)), (k, vs) => (k, vs.sum)) >> toOutputPath(dest)
+}
+
+
 object YahdWordGroupByLengthJob extends JobApp("word group by length") {
 
   val src = "src/test/resources/sample.txt"
@@ -48,3 +58,5 @@ object YahdWordCountByLengthJob extends JobApp("word count by length") {
   fromInputPath(src) >> parseText.flatMap(_.words).groupOn(_.length).lengthValues.formatText >> toOutputPath(dest)
   
 }
+
+

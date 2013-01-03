@@ -6,7 +6,7 @@ import Prelude._
 import com.github.yahd.M
 
 class Map[A, B](val pm: A => Iterable[B]) extends MapLike[A, B] {
-
+  
   override def flatMap[C](f: B => Iterable[C]) =
     new Map[A, C](pm >>>(_.flatMap(f)))
 

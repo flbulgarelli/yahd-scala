@@ -5,6 +5,6 @@ import com.github.yahd.MonadicLike
 
 trait MapLike[A, B] extends MonadicLike[B] {
 
-  type This[C] = Map[A, C]
+  override type OutFunctor[C] = Map[A, C]
 
 }

@@ -20,6 +20,36 @@ class YahdTest extends FunSuite with YahdTestLike {
         lengthValues
     }
   }
+  
+    test("dsl with mapWithKey") {
+    runStreamJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .mapWithKey((x, y) => y.size)
+    }
+  }
+
+  test("dsl with mapValuesUsingMapper") {
+    runStreamJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .mapValuesUsingMapper(const(1))
+        .sumValues
+    }
+  }
+
+  /*test("dsl with mapValues") {
+    runStreamJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .mapValues(const(1))
+        .sumValues
+    }
+  }*/
+
   test("dsl with groupOn") {
     runStreamJob {
       _.
@@ -60,7 +90,7 @@ class YahdTest extends FunSuite with YahdTestLike {
       _.
         flatMap(_.words).
         groupMappingOn(id)(const(1)).
-        combineValues(_ + _)
+        reduceValuesUsingCombiner(_ + _)
     }
   }
   import Prelude.Grouping.onValue
@@ -69,7 +99,7 @@ class YahdTest extends FunSuite with YahdTestLike {
       _.
         flatMap(_.words).
         group.
-        mapGroups(onValue(_.size))
+        mapGroup(onValue(_.size))
     }
   }
 
@@ -79,9 +109,11 @@ class YahdTest extends FunSuite with YahdTestLike {
         flatMap(_.words).
         map { x => (x, 1) }.
         groupMappingOn(_._1)(_._2).
-        mapGroups((k, vs) => (k, vs.sum))
+        mapGroup((k, vs) => (k, vs.sum))
     }
   }
+  
+  
 
   ignore("dsl without reducer") {
     runStreamJob {
@@ -90,7 +122,7 @@ class YahdTest extends FunSuite with YahdTestLike {
         map { x => (x, 1) }
     }
   }
-  
+
   test("dsl with filter") {
     runStreamJob {
       _.
@@ -100,7 +132,6 @@ class YahdTest extends FunSuite with YahdTestLike {
         lengthValues
     }
   }
-  
 
   test("AllWithDslLowLevelAndCombiner") {
     runJob {

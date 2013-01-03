@@ -8,6 +8,8 @@ object Prelude {
   def const[A, B](x: B) = { _: A => x }
 
   type Id[A] = A
+  
+  def fromInt[N](int : Int)(implicit n : Numeric[N]) = n.fromInt(int)
 
   implicit def function2Composable[A, B](f:A => B) = new AnyRef {
     def >>>[C] = (g: B => C) => f.andThen(g)
