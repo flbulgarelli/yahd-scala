@@ -52,7 +52,7 @@ trait MonadicWithKeyLike[K, V] extends MonadicLike[V] {
   def flatMapGroup[K2, V2](f: (K, V) => Iterable[Grouping[K2, V2]]): OutFunctorWithKey[K2, V2]
 }
 
-trait FunctorWithTraversableValuesLike[K, A] extends MonadicWithKeyLike[K, Iterable[A]] {
+trait FunctorWithTraversableValuesLike[A] extends FunctorLike[Iterable[A]] {
 
   type OutFunctorOnAssociativeConmutative[B]
 

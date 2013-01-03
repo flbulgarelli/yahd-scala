@@ -6,12 +6,10 @@ import com.github.yahd.MR
 import com.github.yahd.MonadicWithKeyLike
 import com.github.yahd.FunctorWithTraversableValuesLike
 
-class Reduce[A, B, C, D, E](m: MFunction[A, B, C], r: RFunction[B, C, D, E])
+class Reduce[A, B, C, D, E](private val m: MFunction[A, B, C], private val r: RFunction[B, C, D, E])
   extends MonadicWithKeyLike[D, E]
-//  with FunctorWithTraversableValuesLike[E]
   with TerminalLike[A, B, C, D, E] {
 
-//  override type OutFunctorOnAssociativeConmutative[E2] = Reduce[A, B, C, D, E2]
   override type OutFunctorWithKey[D2, E2] = Reduce[A, B, C, D2, E2]
 
   def mcr = MR(m, r)
@@ -23,6 +21,16 @@ class Reduce[A, B, C, D, E](m: MFunction[A, B, C], r: RFunction[B, C, D, E])
   //XXX
   //    new Reduce[A, B, C, D2, E2](m, Function.untupled(r.tupled >>> { _.flatMap(f.tupled) }))
 
-//  override def genericCountValues[N: Numeric](f: A => Boolean) = map { (x: E) => fromInt(x.count(f)) }
+}
 
+object Reduce {
+  implicit def reduce2FunctorWithTraversableValues[A, B, C, D, E](reduce: Reduce[A, B, C, D, Iterable[E]]) =
+    new Reduce[A, B, C, D, Iterable[E]](reduce.m, reduce.r) with FunctorWithTraversableValuesLike[E] {
+
+      override type OutFunctorOnAssociativeConmutative[E2] = Reduce[A, B, C, D, E2]
+
+      override def genericCountValues[N: Numeric](f: E => Boolean) = map { x => fromInt(x.count(f)) }
+
+      protected override def mapOnAssociativeConmutative(f: Iterable[E] => E) = map(f)
+    }
 }

@@ -20,8 +20,8 @@ class YahdTest extends FunSuite with YahdTestLike {
         lengthValues
     }
   }
-  
-    test("dsl with mapWithKey") {
+
+  test("dsl with mapWithKey") {
     runStreamJob { stream =>
       stream
         .flatMap(_.words)
@@ -40,7 +40,7 @@ class YahdTest extends FunSuite with YahdTestLike {
     }
   }
 
-  /*test("dsl with mapValues") {
+  test("dsl with mapValues") {
     runStreamJob { stream =>
       stream
         .flatMap(_.words)
@@ -48,7 +48,7 @@ class YahdTest extends FunSuite with YahdTestLike {
         .mapValues(const(1))
         .sumValues
     }
-  }*/
+  }
 
   test("dsl with groupOn") {
     runStreamJob {
@@ -112,8 +112,6 @@ class YahdTest extends FunSuite with YahdTestLike {
         mapGroup((k, vs) => (k, vs.sum))
     }
   }
-  
-  
 
   ignore("dsl without reducer") {
     runStreamJob {

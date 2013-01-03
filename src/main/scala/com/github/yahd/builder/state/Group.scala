@@ -8,8 +8,8 @@ import com.github.yahd.MonadicWithKeyLike
 import com.github.yahd.FunctorWithTraversableValuesLike
 
 class Group[A, B, C](m: MFunction[A, B, C])
-//  extends MonadicWithKeyLike[B, Iterable[C]]
-  extends FunctorWithTraversableValuesLike[B, C] {
+  extends MonadicWithKeyLike[B, Iterable[C]]
+  with FunctorWithTraversableValuesLike[C] {
 
   override type OutFunctorWithKey[D, E] = Reduce[A, B, C, D, E]
   override type OutFunctorOnAssociativeConmutative[C2] = Combine[A, B, C2]
