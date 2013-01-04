@@ -3,10 +3,8 @@ import com.github.yahd.Yahd._
 import com.github.yahd.MCR
 import com.github.yahd.Prelude._
 import scala.collection.generic.FilterMonadic
-import com.github.yahd.MonadicLike
-import com.github.yahd.MonadicWithKeyLike
-import com.github.yahd.FunctorWithTraversableValuesLike
 
+import generic._
 class Group[A, B, C](m: MFunction[A, B, C])
   extends MonadicWithKeyLike[B, Iterable[C]]
   with FunctorWithTraversableValuesLike[C] {
@@ -46,6 +44,6 @@ class Group[A, B, C](m: MFunction[A, B, C])
   override def genericCountValues[N: Numeric](f: C => Boolean) =
     composedGroup[N](_.flatMap { case (x, y) => if (f(y)) List(unitary(x)) else Nil }).sumValues
 
-  //TODO distinct, average, count = length?, map as groupMapping?, support list as output, pipeline of reduce
+  //TODO distinct, average, count = length?, map as groupMapping?, support list as output
 }
 

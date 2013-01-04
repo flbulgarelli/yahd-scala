@@ -3,8 +3,8 @@ package com.github.yahd.builder.state
 import com.github.yahd.Yahd._
 import com.github.yahd.Prelude._
 import com.github.yahd.MR
-import com.github.yahd.MonadicWithKeyLike
-import com.github.yahd.FunctorWithTraversableValuesLike
+
+import generic._
 
 class Reduce[A, B, C, D, E](private val m: MFunction[A, B, C], private val r: RFunction[B, C, D, E])
   extends MonadicWithKeyLike[D, E]

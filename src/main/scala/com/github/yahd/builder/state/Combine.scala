@@ -2,7 +2,8 @@ package com.github.yahd.builder.state
 
 import com.github.yahd.Yahd._
 import com.github.yahd.MC
-import com.github.yahd.MonadicWithKeyLike
+
+import generic._
 
 class Combine[A, B, C](m: MFunction[A, B, C], c: CFunction[B, C])
   //  extends MonadicWithKeyLike[B, C]
