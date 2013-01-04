@@ -6,7 +6,7 @@ import Prelude._
 import org.apache.hadoop.mapreduce.Mapper
 import org.apache.hadoop.mapreduce.Reducer
 
-abstract class MCR[A, B, C, D, E]
+sealed abstract class MCR[A, B, C, D, E]
 
 case class M[A, B, C, D, E](m: MFunction[A, D, E]) extends MCR[A, B, C, D, E]
 case class MC[A, B, C, D, E](m: MFunction[A, D, E], c: CFunction[D, E]) extends MCR[A, B, C, D, E]
