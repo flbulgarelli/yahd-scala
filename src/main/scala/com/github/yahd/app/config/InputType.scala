@@ -26,9 +26,10 @@ trait InputType extends JobConfiguration {
     job: Job) = {
     
     mcr match {
-      case M(m)     => initApp[WA, WD, WE, WD, WE](m, null, null)
-      case MC(m, c) => initApp[WA, WD, WE, WD, WE](m, c, c)
-      case MR(m, r) => initApp[WA, WB, WC, WD, WE](m, null, r)
+      case M(m)        => initApp[WA, WD, WE, WD, WE](m, null, null)
+      case MC(m, c)    => initApp[WA, WD, WE, WD, WE](m, c, c)
+      case FMCR(m, c, r)  => initApp[WA, WB, WC, WD, WE](m, c, r)
+      case MR(m, r)    => initApp[WA, WB, WC, WD, WE](m, null, r)
     }
     
     job.setMapOutputKeyClass(bManifest.erasure)

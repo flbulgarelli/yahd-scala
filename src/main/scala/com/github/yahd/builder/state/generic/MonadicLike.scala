@@ -9,7 +9,7 @@ trait MonadicLike[A] extends FunctorLike[A] {
 
   def filter(f: A => Boolean) =
     flatMap { x => if (f(x)) List(x) else Nil }
-
+  
   def flatMap[B](f: A => Iterable[B]): OutFunctor[B]
 }
 

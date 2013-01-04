@@ -13,7 +13,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
   override type OutFunctorOnAssociativeConmutative[C2] = Combine[A, B, C2]
 
   override def flatMapGroup[D, E](f: (B, Iterable[C]) => Iterable[Grouping[D, E]]) =
-    new Reduce[A, B, C, D, E](m, { (k, vs) => f(k, vs) })
+    primitiveR { (k, vs) => f(k, vs) }
 
   def reduceValuesUsingCombiner(f: (C, C) => C) =
     mapUsingCombiner(_.reduce(f))
@@ -22,7 +22,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
     mapOnAssociativeConmutative _
 
   protected override def mapOnAssociativeConmutative(f: Iterable[C] => C) =
-    new Combine[A, B, C](m, (k, vs) => Grouping(k, f(vs)))
+    primitiveC { (k, vs) => Grouping(k, f(vs)) }
 
   def flatMapValuesUsingMapper[D](f: C => Iterable[D]) =
     composedGroup[D](_.flatMap { case (x, y) => f(y).map(Grouping(x, _)) })
@@ -44,6 +44,10 @@ class Group[A, B, C](m: MFunction[A, B, C])
   override def genericCountValues[N: Numeric](f: C => Boolean) =
     composedGroup[N](_.flatMap { case (x, y) => if (f(y)) List(unitary(x)) else Nil }).sumValues
 
+  def primitiveC(c: CFunction[B, C]) =  new Combine[A, B, C](m, c)
+  
+  def primitiveR[D, E](r: RFunction[B, C, D, E]) = new Reduce[A, B, C, D, E](m, r)
+  
   //TODO distinct, average, count = length?, map as groupMapping?, support list as output
 }
 

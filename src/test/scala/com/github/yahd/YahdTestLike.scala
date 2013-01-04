@@ -29,9 +29,10 @@ trait YahdTestLike {
     
     
     val mapReduceDriver = mcr match {
-      case M(m)     => newMapDriver[WLong, WString, WString, WInt](m)
-      case MC(m, c) => newMapReduceDriver[WLong, WString, WString, WInt, WString, WInt](m, c, c)
-      case MR(m, r) => newMapReduceDriver[WLong, WString, WB, WC, WString, WInt](m, r)
+      case M(m)       => newMapDriver[WLong, WString, WString, WInt](m)
+      case MC(m, c)   => newMapReduceDriver[WLong, WString, WString, WInt, WString, WInt](m, c, c)
+      case FMCR(m, c, r) => newMapReduceDriver[WLong, WString, WB, WC, WString, WInt](m, r, c)
+      case MR(m, r)   => newMapReduceDriver[WLong, WString, WB, WC, WString, WInt](m, r)
     }
 
     mapReduceDriver.asInstanceOf[Driver].testThat { it =>
