@@ -24,7 +24,7 @@ trait InputConfiguration[A] extends JobConfiguration {
     cManifest: Manifest[WC],
     dManifest: Manifest[WD],
     eManifest: Manifest[WE],
-    jobFactory: JobFactory): ProcessType = {
+    jobFactory: JobFactory): ProcessConfiguration = {
     //XXX this should go into ProcessType
     mcr match {
       case M(m) => initApp[WA, WD, WE, WD, WE](m, null, null)
@@ -33,7 +33,7 @@ trait InputConfiguration[A] extends JobConfiguration {
       case MR(m, r) => initApp[WA, WB, WC, WD, WE](m, null, r)
     }
     jobFactory += this
-    new ProcessType(bManifest.erasure, cManifest.erasure, dManifest.erasure, eManifest.erasure)
+    new ProcessConfiguration(bManifest.erasure, cManifest.erasure, dManifest.erasure, eManifest.erasure)
   }
 
   final def >>[WA, B, WB, C, WC, D, WD, E, WE](mcrBuilder: MCRBuilder[A, B, C, D, E]) //
@@ -46,6 +46,6 @@ trait InputConfiguration[A] extends JobConfiguration {
     cManifest: Manifest[WC],
     dManifest: Manifest[WD],
     eManifest: Manifest[WE],
-    jobFactory: JobFactory): ProcessType = this >> mcrBuilder(from[A]).mcr
+    jobFactory: JobFactory): ProcessConfiguration = this >> mcrBuilder(from[A]).mcr
 }
 

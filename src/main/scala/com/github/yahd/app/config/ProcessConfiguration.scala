@@ -2,7 +2,7 @@ package com.github.yahd.app.config
 import org.apache.hadoop.mapreduce.Job
 import com.github.yahd.app.JobFactory
 
-class ProcessType(
+class ProcessConfiguration(
   mapOutputKeyClass: Class[_],
   mapOutputValueClass: Class[_],
   outputKeyClass: Class[_],
