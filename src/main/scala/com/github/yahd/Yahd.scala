@@ -32,9 +32,22 @@ object Yahd {
 
   /*Hadoop functions type synonyms */
 
+  private type RLikeFunction[A, B, C, D, Functor[_]] = (A, Iterable[B]) => Functor[(C, D)]
+
+  /**
+   * The type of M computation.
+   * @see [[MCR]]
+   */
   type MFunction[A, B, C] = A => Iterable[(B, C)]
-  type RLikeFunction[A, B, C, D, Functor[_]] = (A, Iterable[B]) => Functor[(C, D)]
+  /**
+   * The type of C computation.
+   * @see [[MCR]]
+   */
   type CFunction[A, B] = RLikeFunction[A, B, A, B, Id]
+  /**
+   * The type of R computation.
+   * @see [[MCR]]
+   */
   type RFunction[A, B, C, D] = RLikeFunction[A, B, C, D, Iterable]
 
   /*WritableComparable implicit converters*/
@@ -97,10 +110,14 @@ object Yahd {
 
   import builder.state
 
+  /**
+   * MCRBuilder's is any function that maps from an initial builder state to a terminal state
+   * */
   type MCRBuilder[A, B, C, D, E] = state.Initial[A] => state.TerminalLike[A, B, C, D, E]
 
+  /**Builds an MCR given an [[MCRBuilder]]*/
   def buildMCR[A, B, C, D, E](mcrBuilder: MCRBuilder[A, B, C, D, E]) =
-    mcrBuilder(new state.Initial).mcr
+    mcrBuilder(from[A]).mcr
 
   def from[A] = new state.Initial[A]
 

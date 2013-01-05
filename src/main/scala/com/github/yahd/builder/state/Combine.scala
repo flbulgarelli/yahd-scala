@@ -6,6 +6,11 @@ import com.github.yahd._
 
 import generic._
 
+/**
+ * Builder state reached after and M and  C functions have being registered
+ * 
+ * @author flbulgarelli
+ **/
 class Combine[A, B, C](m: MFunction[A, B, C], c: CFunction[B, C])
   extends MonadicWithKeyLike[B, C]
   with TerminalLike[A, B, C, B, C] {

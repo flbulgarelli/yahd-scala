@@ -17,10 +17,13 @@ class Reduce[A, B, C, D, E](
 
   protected override def newReduce[D2, E2](r: RFunction[B, C, D2, E2]) =
     new Reduce[A, B, C, D2, E2](m, r)
-
 }
 
 object Reduce {
+  /**
+   * Implicit conversion for enabling traversableValues operations when reduce state
+   * has traversable as value
+   */
   implicit def reduce2FunctorWithTraversableValues[A, B, C, D, E](reduce: Reduce[A, B, C, D, Iterable[E]]) =
     new AbstractReduceWithTraversableValuesLike[E] {
       override type OutFunctorOnAssociativeConmutative[E2] = Reduce[A, B, C, D, E2]

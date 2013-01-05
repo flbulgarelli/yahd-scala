@@ -22,6 +22,11 @@ import com.github.yahd.app.config.InputConfiguration
 import com.github.yahd.app.config.JobConfiguration
 import com.github.yahd.app.config.parameter._
 
+/**
+ * Haddop Job configuration DSL entry point
+ * 
+ * @author flbulgarelli
+ */
 trait JobRunner {
 
   def fromTextFile = new TextFileInputConfiguration(CommandLine(0))
