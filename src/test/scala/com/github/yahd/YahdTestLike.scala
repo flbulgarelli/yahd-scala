@@ -13,43 +13,40 @@ trait YahdTestLike {
     def withInput(x: Any, y: Any): Any
     def withOutput(x: Any, y: Any): Any
   }
+  
+  type YahdAssertion[D <: TestDriver[_, _, _, _]] =  D => Unit
+  type YahdDriverAssertion = YahdAssertion[Driver]
 
   implicit def testDriver2RunnableDriver[D <: TestDriver[_, _, _, _]](driver: D) = new Object {
-    def testThat(f: Function[D, Unit]): Unit = {
+    def testThat(f: YahdAssertion[D]): Unit = {
       f(driver)
       driver.runTest
     }
   }
   
-  def runJob[B, WB, C, WC] //
-  (mcr: => MCR[String, B, C, String, Int]) //
+  def defineJob[A, WA, B, WB, C, WC,D, WD, E, WE] //
+  (mcr: MCR[A, B, C, D, E]) //
+  (implicit aConverter: Converter[A, WA],
+    bConverter: Converter[B, WB], 
+    cConverter: Converter[C, WC],
+    dConverter: Converter[D, WD],
+    eConverter: Converter[E, WE]) = 
+    (mcr match {
+      case M(m)          => newMapDriver[WLong, WA, WD, WE](m)
+      case MC(m, c)      => newMapReduceDriver[WLong, WA, WD, WE, WD, WE](m, c, c)
+      case FMCR(m, c, r) => newMapReduceDriver[WLong, WA, WB, WC, WD, WE](m, r, c)
+      case MR(m, r)      => newMapReduceDriver[WLong, WA, WB, WC, WD, WE](m, r)
+    }).asInstanceOf[Driver]
+
+  def defineJob[B, WB, C, WC, D, WD, E, WE] //
+  (mcrBuilder: MCRBuilder[String, B, C, D, E]) //
   (implicit aConverter: Converter[String, WString],
     bConverter: Converter[B, WB],
-    cConverter: Converter[C, WC]) {
-    
-    
-    val mapReduceDriver = mcr match {
-      case M(m)       => newMapDriver[WLong, WString, WString, WInt](m)
-      case MC(m, c)   => newMapReduceDriver[WLong, WString, WString, WInt, WString, WInt](m, c, c)
-      case FMCR(m, c, r) => newMapReduceDriver[WLong, WString, WB, WC, WString, WInt](m, r, c)
-      case MR(m, r)   => newMapReduceDriver[WLong, WString, WB, WC, WString, WInt](m, r)
-    }
-
-    mapReduceDriver.asInstanceOf[Driver].testThat { it =>
-      it.withInput(new WLong(), "hello world hello hello" : WString)
-      it.withOutput("hello" : WString, 3 : WInt)
-      it.withOutput("world" : WString, 1 : WInt)
-    }
-  }
-
-  def runStreamJob[B, WB, C, WC] //
-  (mcrBuilder: MCRBuilder[String, B, C, String, Int]) //
-  (implicit aConverter: Converter[String, WString],
-    bConverter: Converter[B, WB],
-    cConverter: Converter[C, WC]) = {
-    runJob[B, WB, C, WC] {
+    cConverter: Converter[C, WC],
+    dConverter: Converter[D, WD],
+    eConverter: Converter[E, WE]) =
+    defineJob[String, WString, B, WB, C, WC, D, WD, E, WE] {
       buildMCR(mcrBuilder)
     }
-  }
 
 }

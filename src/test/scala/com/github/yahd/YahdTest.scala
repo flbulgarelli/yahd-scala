@@ -12,171 +12,187 @@ import Prelude.Grouping._
 @RunWith(classOf[JUnitRunner])
 class YahdTest extends FunSuite with YahdTestLike {
 
-  type AnyMR = MR[_, _, _, _, _]
-  type AnyMC = MC[_, _, _, _, _]
-  type AnyM = M[_, _, _, _, _]
-  type AnyFMCR = FMCR[_, _, _, _, _]
-
-  test(" M ") {
-    from[String].map(x => (x, 1)).mcr: AnyM
-    from[String].filter { x => x.length() > 10 }.map(unitary(_)).mcr: AnyM
-    from[String].flatMap(x => List((x, 1))).mcr: AnyM
-  }
-
-  test(" MR ") {
-    from[String].map(id).group.map(_.size).mcr: AnyMR
-    from[String].map(id).groupMapping(const(1)).reduceValues(_ + _).mcr: AnyMR
-    from[String].map(id).group.mapValues(const(1)).sumValues.mcr: AnyMR
-    from[String].map(id).group.mapValues(const(1)).sumValues.map { x => x.doubleValue() / 100 }.mcr: AnyMR
-    from[String].map(id).group.takeValues(10).mapValues(_.size).sumValues.mcr: AnyMR
-    from[String].map(id).groupMappingOn(_.head)(_.size).map { x => x.sum / x.size }.mcr: AnyMR
-  }
-
-  test(" MC ") {
-    from[String].map(id).groupMapping(const(1)).minValues.mcr: AnyMC
-    from[String].map(id).groupMapping(const(1)).sumValues.mcr: AnyMC
-    from[String].map(id).groupMapping(const(1)).reduceValuesUsingCombiner(_ + _).mcr: AnyMC
-    from[String].map(id).group.mapValuesUsingMapper(const(1)).sumValues.mcr: AnyMC
-  }
-
-  test(" FMCR ") {
-    from[String].map(id).group.mapValuesUsingMapper(const(1)).sumValues.map { x => x.doubleValue() / 100 }.mcr: AnyFMCR
-    from[String].map(id).groupMappingOn(_.charAt(0))(const(1)).reduceValuesUsingCombiner(_ + _).map { x => x.doubleValue() / 100 }.mcr: AnyFMCR
+  val countsWords: YahdDriverAssertion = { it =>
+    it.withInput(new WLong(), "hello world hello hello": WString)
+    it.withInput(new WLong(), "world world world !": WString)
+    it.withOutput("!": WString, 1: WInt)
+    it.withOutput("hello": WString, 3: WInt)
+    it.withOutput("world": WString, 4: WInt)
   }
 
   test("dsl with group") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        group.
-        lengthValues
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .lengthValues
+    }.testThat(countsWords)
   }
 
   test("dsl with mapWithKey") {
-    runStreamJob { stream =>
+    defineJob { stream =>
       stream
         .flatMap(_.words)
         .group
         .mapWithKey((x, y) => y.size)
-    }
+    }.testThat(countsWords)
   }
 
   test("dsl with mapValuesUsingMapper") {
-    runStreamJob { stream =>
+    defineJob { stream =>
       stream
         .flatMap(_.words)
         .group
         .mapValuesUsingMapper(const(1))
         .sumValues
-    }
+    }.testThat(countsWords)
   }
 
   test("dsl with mapValues") {
-    runStreamJob { stream =>
+    defineJob { stream =>
       stream
         .flatMap(_.words)
-        .group
-        .mapValues(const(1))
+        .group.mapValues(const(1))
         .sumValues
-    }
+    }.testThat(countsWords)
   }
 
   test("dsl with groupOn") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        groupOn(id).
-        lengthValues
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .groupOn(id)
+        .lengthValues
+    }.testThat(countsWords)
   }
   test("dsl with lengthValues") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        group.
-        lengthValues
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .lengthValues
+    }.testThat(countsWords)
   }
 
   test("dsl with groupMapping and sumValues") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        groupMapping(const(1)).
-        sumValues
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .groupMapping(const(1))
+        .sumValues
+    }.testThat(countsWords)
   }
 
   test("dsl with groupMappingOn and mapValuesReducing") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        groupMappingOn(id)(const(1)).
-        reduceValues(_ + _)
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .groupMappingOn(id)(const(1))
+        .reduceValues(_ + _)
+    }.testThat(countsWords)
   }
 
   test("dsl with groupMappingOn and combine ") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        groupMappingOn(id)(const(1)).
-        reduceValuesUsingCombiner(_ + _)
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .groupMappingOn(id)(const(1))
+        .reduceValuesUsingCombiner(_ + _)
+    }.testThat(countsWords)
   }
   import Prelude.Grouping.onValue
   test("dsl with mapValues -- not combinable") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        group.
-        mapGroup(onValue(_.size))
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .mapGroup(onValue(_.size))
+    }.testThat(countsWords)
   }
 
   test("dsl with map") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        map { x => (x, 1) }.
-        groupMappingOn(_._1)(_._2).
-        mapGroup((k, vs) => (k, vs.sum))
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .map { x => (x, 1) }
+        .groupMappingOn(_._1)(_._2)
+        .mapGroup((k, vs) => (k, vs.sum))
+    }.testThat(countsWords)
   }
 
   ignore("dsl without reducer") {
-    runStreamJob {
-      _.
-        flatMap(_.words).
-        map { x => (x, 1) }
-    }
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .map { x => (x, 1) }
+    }.testThat(countsWords)
   }
 
   test("dsl with filter") {
-    runStreamJob {
-      _.
-        filter(!_.startsWith("#")).
-        flatMap(_.words).
-        group.
-        lengthValues
+    defineJob { stream =>
+      stream
+        .filter(!_.startsWith("#"))
+        .flatMap(_.words)
+        .group
+        .lengthValues
+    }.testThat({ it =>
+      it.withInput(new WLong(), "# hello hadoop": WString)
+      it.withInput(new WLong(), "hello world hello hello": WString)
+      it.withInput(new WLong(), "world world world !": WString)
+      it.withOutput("!": WString, 1: WInt)
+      it.withOutput("hello": WString, 3: WInt)
+      it.withOutput("world": WString, 4: WInt)
+    })
+  }
+
+  test("dsl with filter 2") {
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .filter(_.charAt(0).isLetterOrDigit)
+        .group
+        .lengthValues
+    }.testThat { it =>
+      it.withInput(new WLong(), "# hello hadoop": WString)
+      it.withInput(new WLong(), "hello world hello hello": WString)
+      it.withInput(new WLong(), "world world world !": WString)
+      it.withOutput("hadoop": WString, 1: WInt)
+      it.withOutput("hello": WString, 4: WInt)
+      it.withOutput("world": WString, 4: WInt)
     }
   }
 
+  test("dsl with filter 3") {
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .group
+        .lengthValues
+        .filter(_ <= 3)
+    }.testThat { it =>
+      it.withInput(new WLong(), "hadoop": WString)
+      it.withInput(new WLong(), "hello world hello hello": WString)
+      it.withInput(new WLong(), "world world world": WString)
+      it.withOutput("hadoop": WString, 1: WInt)
+      it.withOutput("hello": WString, 3: WInt)
+    }
+  }
+
+
   test("AllWithDslLowLevelAndCombiner") {
-    runJob {
+    defineJob {
       MC[String, String, Int, String, Int](
         _.words.map { x => (x, 1) },
         (k, v) => (k, v.sum))
-    }
+    }.testThat(countsWords)
   }
 
   test("AllWithDslLowLevel") {
-    runJob {
+    defineJob {
       MR[String, String, Int, String, Int](
         _.words.map { x => (x, 1) },
         (k, v) => List((k, v.sum)))
-    }
+    }.testThat(countsWords)
   }
 
 }
