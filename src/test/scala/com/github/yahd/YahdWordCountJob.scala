@@ -39,7 +39,7 @@ object YahdWordCountJobPlain extends JobApp("word count 2") {
   val dest = "out5"
 
   import Grouping._
-  fromTextFile(src) >> MC[String, String, Int, String, Int](x => List((x, 1)), (k, vs) => (k, vs.sum)) >> toTextFile(dest)
+  fromTextFile(src) >> MC[String, String, Int, String, Int](x => List(unitary(x)), (k, vs) => (k, vs.sum)) >> toTextFile(dest)
 }
 
 object YahdWordCountJobPlain2 extends JobApp("word count 2") {

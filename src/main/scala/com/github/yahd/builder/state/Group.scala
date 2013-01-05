@@ -36,18 +36,25 @@ class Group[A, B, C](m: MFunction[A, B, C])
   private def composedGroup[D](g: Iterable[Grouping[B, C]] => Iterable[Grouping[B, D]]) =
     new Group[A, B, D](m >>> g)
 
-  import Grouping.unitary
+  import Grouping._
+
+  def averageValues(implicit n: Numeric[C]) = { 
+    import n._
+    mapValuesUsingMapper { x => genericUnitary(x) }
+      .reduceValuesUsingCombiner { (value, count) => distribute(value, count)(_+_) }
+      .map( result => result._1.toDouble / result._2.toDouble )
+  }
 
   override def genericLengthValues[N: Numeric] =
-    composedGroup[N](_.map { case (x, y) => unitary(x) }).sumValues
+    mapValuesUsingMapper[N] { x => genericOne }.sumValues
 
   override def genericCountValues[N: Numeric](f: C => Boolean) =
-    composedGroup[N](_.flatMap { case (x, y) => if (f(y)) List(unitary(x)) else Nil }).sumValues
+    flatMapValuesUsingMapper[N] { x => if (f(x)) List(genericOne) else Nil }.sumValues
 
-  def c(c: CFunction[B, C]) =  new Combine[A, B, C](m, c)
-  
+  def c(c: CFunction[B, C]) = new Combine[A, B, C](m, c)
+
   def r[D, E](r: RFunction[B, C, D, E]) = new Reduce[A, B, C, D, E](m, r)
-  
+
   //TODO distinct, average, count = length?, map as groupMapping?, support list as output
 }
 

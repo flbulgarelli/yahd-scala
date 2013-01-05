@@ -14,7 +14,7 @@ import com.github.yahd.Yahd._
 
 trait InputConfiguration[A] extends JobConfiguration {
 
-  def >>[WA, B, WB, C, WC, D, WD, E, WE](mcr: MCR[A, B, C, D, E]) //
+  final def >>[WA, B, WB, C, WC, D, WD, E, WE](mcr: MCR[A, B, C, D, E]) //
   (implicit aConverter: Converter[A, WA],
     bConverter: Converter[B, WB],
     cConverter: Converter[C, WC],
@@ -36,7 +36,7 @@ trait InputConfiguration[A] extends JobConfiguration {
     new ProcessType(bManifest.erasure, cManifest.erasure, dManifest.erasure, eManifest.erasure)
   }
 
-  def >>[WA, B, WB, C, WC, D, WD, E, WE](mcrBuilder: MCRBuilder[A, B, C, D, E]) //
+  final def >>[WA, B, WB, C, WC, D, WD, E, WE](mcrBuilder: MCRBuilder[A, B, C, D, E]) //
   (implicit aConverter: Converter[A, WA],
     bConverter: Converter[B, WB],
     cConverter: Converter[C, WC],

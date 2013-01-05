@@ -15,7 +15,7 @@ class ProcessType(
     job.setOutputValueClass(outputValueClass)
   }
 
-  def >>(out: OutputConfiguration)(implicit jobFactory: JobFactory) {
+  final def >>(out: OutputConfiguration)(implicit jobFactory: JobFactory) {
     jobFactory += this
     jobFactory += out
   }

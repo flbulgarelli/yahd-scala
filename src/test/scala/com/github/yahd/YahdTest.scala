@@ -19,7 +19,7 @@ class YahdTest extends FunSuite with YahdTestLike {
 
   test(" M ") {
     from[String].map(x => (x, 1)).mcr: AnyM
-    from[String].filter { x => x.length() > 10 }.map(x => (x, 1)).mcr: AnyM
+    from[String].filter { x => x.length() > 10 }.map(unitary(_)).mcr: AnyM
     from[String].flatMap(x => List((x, 1))).mcr: AnyM
   }
 

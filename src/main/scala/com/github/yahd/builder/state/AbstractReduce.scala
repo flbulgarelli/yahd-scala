@@ -14,9 +14,6 @@ abstract class AbstractReduce[A, B, C, D, E](private val m: MFunction[A, B, C], 
     }
 
   protected def newReduce[D2, E2](r: RFunction[B, C, D2, E2]): OutFunctorWithKey[D2, E2]
-  //XXX
-  //    new Reduce[A, B, C, D2, E2](m, Function.untupled(r.tupled >>> { _.flatMap(f.tupled) }))
-
 }
 
 abstract class AbstractReduceWithTraversableValuesLike[E] extends FunctorWithTraversableValuesLike[E] {
@@ -26,4 +23,9 @@ abstract class AbstractReduceWithTraversableValuesLike[E] extends FunctorWithTra
   override def genericCountValues[N: Numeric](f: E => Boolean) = map { x => fromInt(x.count(f)) }
 
   protected override def mapOnAssociativeConmutative(f: Iterable[E] => E) = map(f)
+
+  def averageValues(implicit n: Numeric[E]) = {
+    import n._
+    map { x => x.sum.toDouble / x.size.toDouble }
+  }
 }
