@@ -18,11 +18,11 @@ import app.JobApp
 
 
 /**The simplest word count that can be described with Yahd*/
-object WordCountJob extends JobApp("Deadly Simple Word Count") {
+object WordCountJob extends JobApp("WordCount") {
 
   val src = "src/test/resources/sample.txt"
   val dest = "out"
 
-  fromTextFile(src) >> { _.flatMap(_.words).group.lengthValues } >> toTextFile(dest)
+  fromTextFile >> { _.flatMap(_.words).group.lengthValues } >> toTextFile
 }
 

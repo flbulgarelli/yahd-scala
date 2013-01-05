@@ -1,0 +1,19 @@
+apply plugin: 'scala'
+apply plugin: 'eclipse'
+
+dependencies {
+  compile 'com.gh.roggen:yahd-scala:1.0.0-SNAPSHOT'   
+
+  scalaTools 'org.scala-lang:scala-compiler:2.9.1'
+  compile 'org.scala-lang:scala-library:2.9.1'
+}
+
+repositories {
+  mavenCentral()
+  mavenLocal()
+}
+
+jar {
+  from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  manifest { attributes 'Main-Class': 'com.github.yahd.examples.WordCountJob' }
+}

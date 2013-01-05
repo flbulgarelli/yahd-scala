@@ -5,7 +5,7 @@ import Yahd._
 import Prelude._
 import app._
 
-object LowLevelApiWordCount extends JobApp("Low Level API Word Count") {
+object LowLevelApiWordCount extends JobApp("LowLevelWordCount") {
 
   val src = "src/test/resources/sample.txt"
   val dest = "out5"
