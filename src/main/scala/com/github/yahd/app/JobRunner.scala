@@ -20,32 +20,7 @@ import com.github.yahd.app.config.TextFileOutputConfiguration
 import com.github.yahd.app.config.OutputConfiguration
 import com.github.yahd.app.config.InputConfiguration
 import com.github.yahd.app.config.JobConfiguration
-import com.github.yahd.app.config.Fixed
-import com.github.yahd.app.config.CommandLine
-
-class JobFactory {
-  private val conf = new Configuration
-  private val job = new Job(conf)
-
-  import scala.collection.mutable.ArrayBuffer
-  private val configurations: ArrayBuffer[JobConfiguration] = new ArrayBuffer(3)
-
-  def +=(configuration: JobConfiguration ) = {
-    configurations += configuration
-  }
-
-
-  def createJob(jobName: String, args: Array[String]) = {
-    job.setJobName(jobName)
-    job.setJarByClass(getClass)
-
-    configurations.foreach { _.configureJob(args, job) }
-
-    app.AppGlobalConfig.configureJob(job)
-    job
-  }
-
-}
+import com.github.yahd.app.config.parameter._
 
 trait JobRunner {
 
