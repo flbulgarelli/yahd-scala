@@ -24,16 +24,28 @@ import com.github.yahd.app.config.parameter._
 
 /**
  * Haddop Job configuration DSL entry point
- * 
+ *
  * @author flbulgarelli
  */
 trait JobRunner {
 
-  def fromTextFile = new TextFileInputConfiguration(CommandLine(0))
-  def fromTextFile(src: String) = new TextFileInputConfiguration(Fixed(src))
+  def fromTextFile: TextFileInputConfiguration =
+    fromTextFile(CommandLine(0))
 
-  def toTextFile = new TextFileOutputConfiguration(CommandLine(1))
-  def toTextFile(drain: String) = new TextFileOutputConfiguration(Fixed(drain))
+  def fromTextFile(src: String): TextFileInputConfiguration =
+    fromTextFile(Fixed(src))
+
+  def fromTextFile(path: PathParameter) =
+    new TextFileInputConfiguration(path)
+
+  def toTextFile: TextFileOutputConfiguration =
+    toTextFile(CommandLine(1))
+
+  def toTextFile(drain: String): TextFileOutputConfiguration =
+    toTextFile(Fixed(drain))
+
+  def toTextFile(path: PathParameter): TextFileOutputConfiguration =
+    new TextFileOutputConfiguration(path)
 
   implicit val jobFactory: JobFactory = new JobFactory
 
