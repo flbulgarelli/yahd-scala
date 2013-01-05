@@ -9,16 +9,16 @@ import com.github.yahd.M
  * Builder state reached after a flatMap function has being registered
  * @author flbulgarelli
  */
-class Map[A, B](private val pm: A => Iterable[B]) extends MapLike[A, B] {
+class Map[A, B](private val pm: A => Traversable[B]) extends MapLike[A, B] {
 
-  override def flatMap[C](f: B => Iterable[C]) =
+  override def flatMap[C](f: B => Traversable[C]) =
     new Map[A, C](pm >>> (_.flatMap(f)))
 
   /**
    * Partitions this stream based on elements equality, that is, answers a partitioned stream 
    * where equal elements are members of the same group.
    * 
-   * This computation is analogous to [[TraversableOnce#groupBy]], 
+   * This computation is analogous to [[Traversable#groupBy]], 
    * using the identity function.
    * 
    * For example, if you have a stream of strings with elements ["foo", "bar", "foo" and "foobar"], the following code:
@@ -39,7 +39,7 @@ class Map[A, B](private val pm: A => Iterable[B]) extends MapLike[A, B] {
 
   /**
    * Partitions this stream of elements using the given group function as discriminator.
-   * This computation is analogous to [[TraversableOnce#groupBy]].
+   * This computation is analogous to [[Traversable#groupBy]].
    *
    * For example, let suppose a stream of log entries, where, among other information,
    * each one provides its size in KB and the event hour; and we are interested in the average

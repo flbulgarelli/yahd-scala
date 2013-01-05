@@ -19,7 +19,7 @@ class Combine[A, B, C](m: MFunction[A, B, C], c: CFunction[B, C])
 
   override def mcr = MC(m, c)
 
-  override def flatMapGroup[D, E](f: (B, C) => Iterable[Grouping[D, E]]) =
+  override def flatMapGroup[D, E](f: (B, C) => Traversable[Grouping[D, E]]) =
     r {
       (k, vs) => c(k, vs) match { case (k2, v2) => f(k2, v2) }
     }

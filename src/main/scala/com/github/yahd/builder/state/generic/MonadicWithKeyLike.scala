@@ -8,7 +8,7 @@ trait MonadicWithKeyLike[K, V] extends MonadicLike[V] {
 
   /*Default implementation of flatMap*/
 
-  override def flatMap[V2](f: V => Iterable[V2]) =
+  override def flatMap[V2](f: V => Traversable[V2]) =
     flatMapWithKey((x, y) => f(y))
 
   /*Map With Key*/
@@ -19,7 +19,7 @@ trait MonadicWithKeyLike[K, V] extends MonadicLike[V] {
   def filterWithKey(f: (K, V) => Boolean) =
     flatMapWithKey { (x, y) => if (f(x, y)) List(y) else Nil }
 
-  def flatMapWithKey[V2](f: (K, V) => Iterable[V2]) =
+  def flatMapWithKey[V2](f: (K, V) => Traversable[V2]) =
     flatMapGroup((x, y) => f(x, y).map(Grouping(x, _)))
 
   /*Map Group*/
@@ -30,5 +30,5 @@ trait MonadicWithKeyLike[K, V] extends MonadicLike[V] {
   def filterGroup(f: (K, V) => Boolean): OutFunctorWithKey[K, V] =
     flatMapGroup { (x, y) => if (f(x, y)) List(Grouping(x, y)) else Nil }
 
-  def flatMapGroup[K2, V2](f: (K, V) => Iterable[Grouping[K2, V2]]): OutFunctorWithKey[K2, V2]
+  def flatMapGroup[K2, V2](f: (K, V) => Traversable[Grouping[K2, V2]]): OutFunctorWithKey[K2, V2]
 }

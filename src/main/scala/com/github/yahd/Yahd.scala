@@ -32,13 +32,13 @@ object Yahd {
 
   /*Hadoop functions type synonyms */
 
-  private type RLikeFunction[A, B, C, D, Functor[_]] = (A, Iterable[B]) => Functor[(C, D)]
+  private type RLikeFunction[A, B, C, D, Functor[_]] = (A, Traversable[B]) => Functor[(C, D)]
 
   /**
    * The type of M computation.
    * @see [[MCR]]
    */
-  type MFunction[A, B, C] = A => Iterable[(B, C)]
+  type MFunction[A, B, C] = A => Traversable[(B, C)]
   /**
    * The type of C computation.
    * @see [[MCR]]
@@ -48,7 +48,7 @@ object Yahd {
    * The type of R computation.
    * @see [[MCR]]
    */
-  type RFunction[A, B, C, D] = RLikeFunction[A, B, C, D, Iterable]
+  type RFunction[A, B, C, D] = RLikeFunction[A, B, C, D, Traversable]
 
   /*WritableComparable implicit converters*/
 

@@ -6,7 +6,7 @@ import scala.collection.generic.FilterMonadic
 
 import generic._
 class Group[A, B, C](m: MFunction[A, B, C])
-  extends MonadicWithKeyLike[B, Iterable[C]]
+  extends MonadicWithKeyLike[B, Traversable[C]]
   with FunctorWithTraversableValuesLike[C] {
 
   override type OutFunctorWithKey[D, E] = Reduce[A, B, C, D, E]
@@ -16,7 +16,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
   /*  Monadic with Keys Protocol */
   /*  ========================== */
 
-  override def flatMapGroup[D, E](f: (B, Iterable[C]) => Iterable[Grouping[D, E]]) =
+  override def flatMapGroup[D, E](f: (B, Traversable[C]) => Traversable[Grouping[D, E]]) =
     r { (k, vs) => f(k, vs) }
 
   /*  ===================================== */
@@ -24,7 +24,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
   /*  ===================================== */
   
   import Grouping._
-  protected override def mapOnAssociativeConmutative(f: Iterable[C] => C) =
+  protected override def mapOnAssociativeConmutative(f: Traversable[C] => C) =
     c { (k, vs) => Grouping(k, f(vs)) }
 
   override def genericLengthValues[N: Numeric] =
@@ -52,7 +52,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
   def mapUsingCombiner =
     mapOnAssociativeConmutative _
 
-  def flatMapValuesUsingMapper[D](f: C => Iterable[D]) =
+  def flatMapValuesUsingMapper[D](f: C => Traversable[D]) =
     composedGroup[D](_.flatMap { case (x, y) => f(y).map(Grouping(x, _)) })
 
   def mapValuesUsingMapper[D](f: C => D) =
@@ -78,7 +78,7 @@ class Group[A, B, C](m: MFunction[A, B, C])
   /*  ==================  */
 
   /**implements the given computation inside a group state*/
-  private def composedGroup[D](g: Iterable[Grouping[B, C]] => Iterable[Grouping[B, D]]) =
+  private def composedGroup[D](g: Traversable[Grouping[B, C]] => Traversable[Grouping[B, D]]) =
     new Group[A, B, D](m >>> g)
 
   /*  ==============  */

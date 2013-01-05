@@ -9,12 +9,12 @@ trait MonadicLike[A] extends FunctorLike[A] {
 
   /**
    * Selects all elements of this general collection which satisfy a predicate.
-   * Analogous to [[TraversableOnce#filter]]
+   * Analogous to [[Traversable#filter]]
    */
   def filter(f: A => Boolean) =
     flatMap { x => if (f(x)) List(x) else Nil }
 
-  def flatMap[B](f: A => Iterable[B]): OutFunctor[B]
+  def flatMap[B](f: A => Traversable[B]): OutFunctor[B]
 }
 
 

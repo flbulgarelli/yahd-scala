@@ -24,9 +24,9 @@ object Reduce {
    * Implicit conversion for enabling traversableValues operations when reduce state
    * has traversable as value
    */
-  implicit def reduce2FunctorWithTraversableValues[A, B, C, D, E](reduce: Reduce[A, B, C, D, Iterable[E]]) =
+  implicit def reduce2FunctorWithTraversableValues[A, B, C, D, E](reduce: Reduce[A, B, C, D, Traversable[E]]) =
     new AbstractReduceWithTraversableValuesLike[E] {
       override type OutFunctorOnAssociativeConmutative[E2] = Reduce[A, B, C, D, E2]
-      override def map[E2](f: Iterable[E] => E2) = reduce.map(f)
+      override def map[E2](f: Traversable[E] => E2) = reduce.map(f)
     }
 }

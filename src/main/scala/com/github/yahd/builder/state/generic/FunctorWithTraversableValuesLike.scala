@@ -1,13 +1,13 @@
 package com.github.yahd.builder.state.generic
 import com.github.yahd.Prelude._
 
-trait FunctorWithTraversableValuesLike[A] extends FunctorLike[Iterable[A]] {
+trait FunctorWithTraversableValuesLike[A] extends FunctorLike[Traversable[A]] {
 
   type OutFunctorOnAssociativeConmutative[B]
 
-  protected def mapOnAssociativeConmutative(f: Iterable[A] => A): OutFunctorOnAssociativeConmutative[A]
+  protected def mapOnAssociativeConmutative(f: Traversable[A] => A): OutFunctorOnAssociativeConmutative[A]
 
-  def flatMapValues[B](f: A => Iterable[B]) =
+  def flatMapValues[B](f: A => Traversable[B]) =
     map(_.flatMap(f))
 
   def mapValues[B](f: A => B) =
