@@ -55,6 +55,6 @@ class Group[A, B, C](m: MFunction[A, B, C])
 
   def r[D, E](r: RFunction[B, C, D, E]) = new Reduce[A, B, C, D, E](m, r)
 
-  //TODO distinct, average, count = length?, map as groupMapping?, support list as output
+  //TODO distinct, count = length?, map as groupMapping?, support list as output
 }
 

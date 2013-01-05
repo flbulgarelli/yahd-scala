@@ -15,8 +15,10 @@ class Combine[A, B, C](m: MFunction[A, B, C], c: CFunction[B, C])
   override def mcr = MC(m, c)
 
   override def flatMapGroup[D, E](f: (B, C) => Iterable[Grouping[D, E]]) =
-    new CombineReduce[A, B, C, D, E](m, c, {
+    r {
       (k, vs) => c(k, vs) match { case (k2, v2) => f(k2, v2) }
-    })
+    }
+
+  def r[D, E](r: RFunction[B, C, D, E]) = new CombineReduce[A, B, C, D, E](m, c, r)
 
 }
