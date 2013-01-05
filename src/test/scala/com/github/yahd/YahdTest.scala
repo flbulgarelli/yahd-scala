@@ -178,6 +178,33 @@ class YahdTest extends FunSuite with YahdTestLike {
     }
   }
 
+  val countsAveragePerFirstLetter: YahdDriverAssertion = { it =>
+    it.withInput(new WLong(), "hadoop": WString)
+    it.withInput(new WLong(), "hello world hello hello": WString)
+    it.withInput(new WLong(), "world world world": WString)
+    it.withOutput("h": WString, (6.0 + 3.0 * 5.0) / 4.0: WDouble)
+    it.withOutput("w": WString, 5: WDouble)
+  }
+  
+  test("dsl with average") {
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .groupOn(_.charAt(0).toString)
+        .mapValues(_.length)
+        .averageValues
+    }.testThat(countsAveragePerFirstLetter)
+  }
+  
+    test("dsl with average on combiner") {
+    defineJob { stream =>
+      stream
+        .flatMap(_.words)
+        .groupOn(_.charAt(0).toString)
+        .mapValuesUsingMapper(_.length)
+        .averageValues
+    }.testThat(countsAveragePerFirstLetter)
+  }
 
   test("AllWithDslLowLevelAndCombiner") {
     defineJob {

@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.Reducer
 import org.apache.hadoop.mapreduce.Mapper
 import Prelude.Id
 import scala.collection.JavaConversions._
-import java.lang.{Iterable => JavaIterable}
+import java.lang.{ Iterable => JavaIterable }
 
 object Yahd {
   /*Hadoop Writable Type Synonyms*/
@@ -25,14 +25,15 @@ object Yahd {
   type WByte = ByteWritable
   type WFloat = FloatWritable
   type WDouble = DoubleWritable
+  type WIntPair = hadoop.IntPair
+  type WLongPair = hadoop.LongPair
 
   type WString = Text
 
   /*Hadoop functions type synonyms */
-  
 
   type MFunction[A, B, C] = A => Iterable[(B, C)]
-  type RLikeFunction[A, B, C, D, Functor[_]] = (A, Iterable[B]) => Functor[(C, D)] 
+  type RLikeFunction[A, B, C, D, Functor[_]] = (A, Iterable[B]) => Functor[(C, D)]
   type CFunction[A, B] = RLikeFunction[A, B, A, B, Id]
   type RFunction[A, B, C, D] = RLikeFunction[A, B, C, D, Iterable]
 
@@ -40,6 +41,18 @@ object Yahd {
 
   abstract class WComparableConverter[A, WA <: WComparable { def get(): A }] extends Converter[A, WA] {
     def unwrap = _.get
+  }
+
+  abstract class WPairComprableConverter[A, WA <: WComparable { def getFirst(): A; def getSecond() : A }] extends Converter[(A, A), WA] {
+    def unwrap = x => (x.getFirst, x.getSecond)
+  }
+
+  implicit val intPairConverter = new WPairComprableConverter[Int, WIntPair] {
+    def wrap = x => new WIntPair(x._1, x._2)
+  }
+
+  implicit val longPairConverter = new WPairComprableConverter[Long, WLongPair] {
+    def wrap = x => new WLongPair(x._1, x._2)
   }
 
   implicit val intConverter = new WComparableConverter[Int, WInt] {
@@ -66,17 +79,18 @@ object Yahd {
     def wrap = new WString(_)
     def unwrap = _.toString
   }
-  
+
   /*Common convertions**/
 
-  implicit def text2String(text: Text) = text.toString
-  implicit def string2Text(string: String) = new Text(string)
-  implicit def int2IntWritable(i: Int) = new IntWritable(i)
+  implicit def text2String(text: WString) = text.toString
+  implicit def string2WString(string: String) = new WString(string)
+  implicit def int2WInt(i: Int) = new WInt(i)
+  implicit def double2WDouble(i: Double) = new WDouble(i)
 
   implicit def string2WordsOps(string: String) = new Object {
     def words = string.split(" ")
   }
-  
+
   /* MCR builder */
 
   import builder.state
@@ -90,8 +104,7 @@ object Yahd {
 
   /*Function to Hadoop Objects convertions*/
 
-  private def newReducer0[B, C, D, E, WB, WC, WD, WE](r: RFunction[B, C, D, E])
-    (implicit bConverter: Converter[B, WB],
+  private def newReducer0[B, C, D, E, WB, WC, WD, WE](r: RFunction[B, C, D, E])(implicit bConverter: Converter[B, WB],
     cConverter: Converter[C, WC],
     dConverter: Converter[D, WD],
     eConverter: Converter[E, WE]) = new Reducer[WB, WC, WD, WE] {
