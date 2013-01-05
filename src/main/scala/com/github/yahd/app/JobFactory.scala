@@ -26,7 +26,7 @@ class JobFactory {
     job.setJobName(jobName)
     job.setJarByClass(getClass)
 
-    configurations.foreach { _.configureJob(args, job) }
+    configurations.foreach { _(args, job) }
 
     AppGlobalConfig.configureJob(job)
     job

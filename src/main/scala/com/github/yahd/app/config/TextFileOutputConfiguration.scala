@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.lib.output._
 import parameter._
 
 abstract class FileOuputConfiguration(pathParam: PathParameter) extends OutputConfiguration {
-  def configureJob(cmdLine: Array[String], job: Job) {
+  def apply(cmdLine: Array[String], job: Job) {
     FileOutputFormat.setOutputPath(job, pathParam.toPath(cmdLine))
     configureFormat(cmdLine, job)
   }

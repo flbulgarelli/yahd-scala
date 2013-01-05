@@ -8,7 +8,7 @@ class ProcessType(
   outputKeyClass: Class[_],
   outputValueClass: Class[_]) extends JobConfiguration {
 
-  override def configureJob(cmdLine: Array[String], job: Job) {
+  override def apply(cmdLine: Array[String], job: Job) {
     job.setMapOutputKeyClass(mapOutputKeyClass)
     job.setMapOutputValueClass(mapOutputValueClass)
     job.setOutputKeyClass(outputKeyClass)

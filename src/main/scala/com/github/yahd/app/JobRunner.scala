@@ -21,6 +21,7 @@ import com.github.yahd.app.config.OutputConfiguration
 import com.github.yahd.app.config.InputConfiguration
 import com.github.yahd.app.config.JobConfiguration
 import com.github.yahd.app.config.parameter._
+import com.github.yahd.app.config.InputConfiguration
 
 /**
  * Haddop Job configuration DSL entry point
@@ -29,6 +30,18 @@ import com.github.yahd.app.config.parameter._
  */
 trait JobRunner {
 
+  type ConfigurationFunction = (Array[String], Job) => Unit
+
+  class OnTheFlyConfiguration(f: ConfigurationFunction) extends JobConfiguration {
+    override def apply(args: Array[String], job: Job) {
+      f(args, job)
+    }
+  }
+
+  def from[A] = new OnTheFlyConfiguration(_: ConfigurationFunction) with InputConfiguration[A]
+
+  def to = new OnTheFlyConfiguration(_: ConfigurationFunction) with OutputConfiguration
+  
   def fromTextFile: TextFileInputConfiguration =
     fromTextFile(CommandLine(0))
 
@@ -48,6 +61,8 @@ trait JobRunner {
     new TextFileOutputConfiguration(path)
 
   implicit val jobFactory: JobFactory = new JobFactory
+
+  implicit def string2Path = new Path(_: String)
 
   def runJob(jobName: String, args: Array[String]) {
     jobFactory.createJob(jobName, args).submit
