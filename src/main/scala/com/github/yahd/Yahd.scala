@@ -87,8 +87,10 @@ object Yahd {
   implicit def int2WInt(i: Int) = new WInt(i)
   implicit def double2WDouble(i: Double) = new WDouble(i)
 
-  implicit def string2WordsOps(string: String) = new Object {
+  //TODO move to prelude
+  implicit def string2WordsOps(string: String) = new AnyRef {
     def words = string.split(" ")
+//    def toAlphanumeric = string.filter { s => s.isSpaceChar || s.isLetterOrDigit }
   }
 
   /* MCR builder */
