@@ -7,8 +7,6 @@ import com.github.yahd._
 import com.github.yahd.Yahd.m2Mapper
 import com.github.yahd.Yahd.r2Reducer
 import com.github.yahd.Yahd.c2Reducer
-import com.github.yahd.app.AppGlobalConfig
-import AppGlobalConfig.{ init => initApp }
 import com.github.yahd.app.JobFactory
 import com.github.yahd.Yahd._
 
@@ -24,16 +22,9 @@ trait InputConfiguration[A] extends JobConfiguration {
     cManifest: Manifest[WC],
     dManifest: Manifest[WD],
     eManifest: Manifest[WE],
-    jobFactory: JobFactory): ProcessConfiguration = {
-    //XXX this should go into ProcessType
-    mcr match {
-      case M(m) => initApp[WA, WD, WE, WD, WE](m, null, null)
-      case MC(m, c) => initApp[WA, WD, WE, WD, WE](m, c, c)
-      case FMCR(m, c, r) => initApp[WA, WB, WC, WD, WE](m, c, r)
-      case MR(m, r) => initApp[WA, WB, WC, WD, WE](m, null, r)
-    }
+    jobFactory: JobFactory) = {
     jobFactory += this
-    new ProcessConfiguration(bManifest.erasure, cManifest.erasure, dManifest.erasure, eManifest.erasure)
+    new ProcessConfiguration[A, WA, B, WB, C, WC, D, WD, E, WE](mcr)
   }
 
   final def >>[WA, B, WB, C, WC, D, WD, E, WE](mcrBuilder: MCRBuilder[A, B, C, D, E]) //
@@ -46,6 +37,7 @@ trait InputConfiguration[A] extends JobConfiguration {
     cManifest: Manifest[WC],
     dManifest: Manifest[WD],
     eManifest: Manifest[WE],
-    jobFactory: JobFactory): ProcessConfiguration = this >> mcrBuilder(from[A]).mcr
+    jobFactory: JobFactory): ProcessConfiguration[A, WA, B, WB, C, WC, D, WD, E, WE] =
+    this >> mcrBuilder(from[A]).mcr
 }
 

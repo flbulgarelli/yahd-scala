@@ -28,7 +28,6 @@ class JobFactory {
 
     configurations.foreach { _(args, job) }
 
-    AppGlobalConfig.configureJob(job)
     job
   }
 }
