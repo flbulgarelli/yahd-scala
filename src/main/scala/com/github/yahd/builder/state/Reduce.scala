@@ -25,8 +25,10 @@ object Reduce {
    * has traversable as value
    */
   implicit def reduce2FunctorWithTraversableValues[A, B, C, D, E](reduce: Reduce[A, B, C, D, Traversable[E]]) =
-    new AbstractReduceWithTraversableValuesLike[E] {
-      override type OutFunctorOnAssociativeConmutative[E2] = Reduce[A, B, C, D, E2]
-      override def map[E2](f: Traversable[E] => E2) = reduce.map(f)
+    new AbstractReduceWithTraversableValuesLike[D, E] {
+      override type OutFunctorWithKey[D2, E2] = Reduce[A, B, C, D2, E2]
+
+      override def flatMapGroup[D2, E2](f: (D, Traversable[E]) => Traversable[Grouping[D2, E2]]) =
+        reduce.flatMapGroup(f)
     }
 }

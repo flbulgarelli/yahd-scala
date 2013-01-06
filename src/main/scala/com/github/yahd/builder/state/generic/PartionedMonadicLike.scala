@@ -1,9 +1,9 @@
 package com.github.yahd.builder.state.generic
 import com.github.yahd.Prelude.Grouping
 
-trait MonadicWithKeyLike[K, V] extends MonadicLike[V] {
+trait PartitionedMonadicLike[K, V] extends MonadicLike[V] {
 
-  override type OutFunctor[V2] = OutFunctorWithKey[K, V2]
+  override final type OutFunctor[V2] = OutFunctorWithKey[K, V2]
   type OutFunctorWithKey[K2, V2]
 
   /*Default implementation of flatMap*/
@@ -19,7 +19,7 @@ trait MonadicWithKeyLike[K, V] extends MonadicLike[V] {
   def filterWithKey(f: (K, V) => Boolean) =
     flatMapWithKey { (x, y) => if (f(x, y)) List(y) else Nil }
 
-  def flatMapWithKey[V2](f: (K, V) => Traversable[V2]) =
+  def flatMapWithKey[V2](f: (K, V) => Traversable[V2]) : OutFunctor[V2] =
     flatMapGroup((x, y) => f(x, y).map(Grouping(x, _)))
 
   /*Map Group*/

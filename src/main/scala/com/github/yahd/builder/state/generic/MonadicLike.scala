@@ -2,9 +2,10 @@ package com.github.yahd.builder.state.generic
 
 import com.github.yahd.Prelude._
 
-trait MonadicLike[A] extends FunctorLike[A] {
-
-  override def map[B](f: A => B) =
+trait MonadicLike[A] {
+  type OutFunctor[B]
+      
+  def map[B](f: A => B) =
     flatMap { x => List(f(x)) }
 
   /**

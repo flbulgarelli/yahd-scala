@@ -2,12 +2,10 @@ package com.github.yahd.builder.state
 import com.github.yahd.Yahd._
 import com.github.yahd.MCR
 import com.github.yahd.Prelude._
-import scala.collection.generic.FilterMonadic
 
 import generic._
 class Group[A, B, C](m: MFunction[A, B, C])
-  extends MonadicWithKeyLike[B, Traversable[C]]
-  with FunctorWithTraversableValuesLike[C] {
+  extends PartitionedMonadicWithTraversableValuesLike[B, C] {
 
   override type OutFunctorWithKey[D, E] = Reduce[A, B, C, D, E]
   override type OutFunctorOnAssociativeConmutative[C2] = Combine[A, B, C2]

@@ -12,7 +12,7 @@ import generic._
  * @author flbulgarelli
  **/
 class Combine[A, B, C](m: MFunction[A, B, C], c: CFunction[B, C])
-  extends MonadicWithKeyLike[B, C]
+  extends PartitionedMonadicLike[B, C]
   with TerminalLike[A, B, C, B, C] {
 
   override type OutFunctorWithKey[D, E] = CombineReduce[A, B, C, D, E]

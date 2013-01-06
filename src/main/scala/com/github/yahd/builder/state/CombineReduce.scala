@@ -8,7 +8,7 @@ import generic._
 /**
  * Builder state reached after M, C and R functions have being registered
  * @author flbulgarelli
- * */
+ */
 class CombineReduce[A, B, C, D, E](
   private val m: MFunction[A, B, C],
   private val c: CFunction[B, C],
@@ -30,8 +30,10 @@ object CombineReduce {
    * has traversable as value
    */
   implicit def reduce2FunctorWithTraversableValues[A, B, C, D, E](combineReduce: CombineReduce[A, B, C, D, Traversable[E]]) =
-    new AbstractReduceWithTraversableValuesLike[E] {
-      override type OutFunctorOnAssociativeConmutative[E2] = CombineReduce[A, B, C, D, E2]
-      override def map[E2](f: Traversable[E] => E2) = combineReduce.map(f)
+    new AbstractReduceWithTraversableValuesLike[D, E] {
+      override type OutFunctorWithKey[D2, E2] = CombineReduce[A, B, C, D2, E2]
+      
+      override def flatMapGroup[D2, E2](f: (D, Traversable[E]) => Traversable[Grouping[D2, E2]]) =
+        combineReduce.flatMapGroup(f)
     }
 }
