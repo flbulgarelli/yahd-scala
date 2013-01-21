@@ -99,6 +99,7 @@ object Yahd {
   implicit def string2WString(string: String) = new WString(string)
   implicit def int2WInt(i: Int) = new WInt(i)
   implicit def double2WDouble(i: Double) = new WDouble(i)
+  implicit def float2WFloat(i: Float) = new WFloat(i)
 
   //TODO move to prelude
   implicit def string2WordsOps(string: String) = new AnyRef {
