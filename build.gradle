@@ -1,8 +1,9 @@
 apply plugin: 'scala'
+apply plugin: 'nexus'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-group = 'com.gh.roggen'
+group = 'net.sf.roggen'
 version = '1.0.0-SNAPSHOT'
 
 dependencies {
@@ -17,4 +18,14 @@ dependencies {
 
 repositories {
   mavenCentral()
+}
+
+buildscript {
+  repositories { 
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.2'
+  }
 }
